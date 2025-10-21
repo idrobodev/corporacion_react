@@ -572,7 +572,7 @@ class ApiService {
   // Obtener participantes
   async getParticipantes() {
     try {
-      const response = await dashboardClient.get('/api/participantes');
+      const response = await dashboardClient.get('/participantes');
       return { data: response.data || [], error: null };
     } catch (error) {
       console.error('Error obteniendo participantes:', error);
@@ -592,7 +592,7 @@ class ApiService {
         };
       }
 
-      const response = await dashboardClient.post('/api/participantes', participanteData);
+      const response = await dashboardClient.post('/participantes', participanteData);
       return { data: response.data, error: null };
     } catch (error) {
       console.error('Error creando participante:', error);
@@ -615,7 +615,7 @@ class ApiService {
         };
       }
 
-      const response = await dashboardClient.put(`/api/participantes/${id}`, participanteData);
+      const response = await dashboardClient.put(`/participantes/${id}`, participanteData);
       return { data: response.data, error: null };
     } catch (error) {
       console.error('Error actualizando participante:', error);
@@ -631,7 +631,7 @@ class ApiService {
   // Eliminar participante
   async deleteParticipante(id) {
     try {
-      await dashboardClient.delete(`/api/participantes/${id}`);
+      await dashboardClient.delete(`/participantes/${id}`);
       return { error: null };
     } catch (error) {
       console.error('Error eliminando participante:', error);
@@ -648,7 +648,7 @@ class ApiService {
   // Obtener mensualidades
   async getMensualidades() {
     try {
-      const response = await dashboardClient.get('/api/mensualidades');
+      const response = await dashboardClient.get('/mensualidades');
       return { data: response.data || [], error: null };
     } catch (error) {
       console.error('Error obteniendo mensualidades:', error);
@@ -669,7 +669,7 @@ class ApiService {
         };
       }
 
-      const response = await dashboardClient.post('/api/mensualidades', mensualidadData);
+      const response = await dashboardClient.post('/mensualidades', mensualidadData);
       return { data: response.data, error: null };
     } catch (error) {
       console.error('Error creando mensualidad:', error);
@@ -692,7 +692,7 @@ class ApiService {
         };
       }
 
-      const response = await dashboardClient.put(`/api/mensualidades/${id}`, mensualidadData);
+      const response = await dashboardClient.put(`/mensualidades/${id}`, mensualidadData);
       return { data: response.data, error: null };
     } catch (error) {
       console.error('Error actualizando mensualidad:', error);
@@ -710,7 +710,7 @@ class ApiService {
   // Obtener sedes
   async getSedes() {
     try {
-      const response = await dashboardClient.get('/api/sedes');
+      const response = await dashboardClient.get('/sedes');
       return { data: response.data || [], error: null };
     } catch (error) {
       console.error('Error obteniendo sedes:', error);
@@ -723,7 +723,7 @@ class ApiService {
 
   async createSede(sedeData) {
     try {
-      const response = await dashboardClient.post('/api/sedes', sedeData);
+      const response = await dashboardClient.post('/sedes', sedeData);
       return { data: response.data, error: null };
     } catch (error) {
       console.error('Error creando sede:', error);
@@ -746,7 +746,7 @@ class ApiService {
         };
       }
 
-      const response = await dashboardClient.put(`/api/sedes/${id}`, sedeData);
+      const response = await dashboardClient.put(`/sedes/${id}`, sedeData);
       return { data: response.data, error: null };
     } catch (error) {
       console.error('Error actualizando sede:', error);
@@ -768,7 +768,7 @@ class ApiService {
         };
       }
 
-      await dashboardClient.delete(`/api/sedes/${id}`);
+      await dashboardClient.delete(`/sedes/${id}`);
       return { error: null };
     } catch (error) {
       console.error('Error eliminando sede:', error);
@@ -788,7 +788,7 @@ class ApiService {
    */
   async getUsuarios() {
     try {
-      const response = await dashboardClient.get('/api/usuarios');
+      const response = await dashboardClient.get('/usuarios');
       return { data: response.data || [], error: null };
     } catch (error) {
       console.error('Error obteniendo usuarios:', error);
@@ -813,7 +813,7 @@ class ApiService {
         };
       }
 
-      const response = await dashboardClient.post('/api/usuarios', usuarioData);
+      const response = await dashboardClient.post('/usuarios', usuarioData);
       return { data: response.data, error: null };
     } catch (error) {
       console.error('Error creando usuario:', error);
@@ -841,7 +841,7 @@ class ApiService {
         };
       }
 
-      const response = await dashboardClient.put(`/api/usuarios/${id}`, usuarioData);
+      const response = await dashboardClient.put(`/usuarios/${id}`, usuarioData);
       return { data: response.data, error: null };
     } catch (error) {
       console.error('Error actualizando usuario:', error);
@@ -867,7 +867,7 @@ class ApiService {
         };
       }
 
-      await dashboardClient.delete(`/api/usuarios/${id}`);
+      await dashboardClient.delete(`/usuarios/${id}`);
       return { error: null };
     } catch (error) {
       console.error('Error eliminando usuario:', error);
@@ -888,7 +888,7 @@ class ApiService {
    */
   async getAcudientes(filters = {}) {
     try {
-      const response = await dashboardClient.get('/api/acudientes', { params: filters });
+      const response = await dashboardClient.get('/acudientes', { params: filters });
       return { data: response.data.data || [], error: null };
     } catch (error) {
       console.error('Error obteniendo acudientes:', error);
@@ -913,7 +913,7 @@ class ApiService {
         };
       }
 
-      const response = await dashboardClient.get(`/api/participantes/${participanteId}/acudientes`);
+      const response = await dashboardClient.get(`/participantes/${participanteId}/acudientes`);
       return { data: response.data || [], error: null };
     } catch (error) {
       console.error('Error obteniendo acudientes del participante:', error);
@@ -939,7 +939,7 @@ class ApiService {
         };
       }
 
-      const response = await dashboardClient.post('/api/acudientes', acudienteData);
+      const response = await dashboardClient.post('/acudientes', acudienteData);
       return { data: response.data, error: null };
     } catch (error) {
       console.error('Error creando acudiente:', error);
@@ -967,7 +967,7 @@ class ApiService {
         };
       }
 
-      const response = await dashboardClient.put(`/api/acudientes/${id}`, acudienteData);
+      const response = await dashboardClient.put(`/acudientes/${id}`, acudienteData);
       return { data: response.data, error: null };
     } catch (error) {
       console.error('Error actualizando acudiente:', error);
@@ -993,7 +993,7 @@ class ApiService {
         };
       }
 
-      await dashboardClient.delete(`/api/acudientes/${id}`);
+      await dashboardClient.delete(`/acudientes/${id}`);
       return { error: null };
     } catch (error) {
       console.error('Error eliminando acudiente:', error);
