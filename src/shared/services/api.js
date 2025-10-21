@@ -2,20 +2,15 @@
 import axios from 'axios';
 
 // Configuración base de las APIs
-// URLs para servicios separados - FastAPI backend con auth y dashboard
+// Solo servicio de autenticación
 const AUTH_API_BASE_URL = process.env.REACT_APP_AUTH_API_BASE_URL ||
   'https://todoporunalma.org/auth';
 
-const DASHBOARD_API_BASE_URL = process.env.REACT_APP_DASHBOARD_API_BASE_URL ||
-  'https://todoporunalma.org/dashboard';
-
 console.log('🔧 AUTH_API_BASE_URL configurada como:', AUTH_API_BASE_URL);
-console.log('🔧 DASHBOARD_API_BASE_URL configurada como:', DASHBOARD_API_BASE_URL);
 
 // Additional diagnostic logging
 console.log('🔧 API CONFIGURATION DIAGNOSTICS:');
 console.log('  - REACT_APP_AUTH_API_BASE_URL:', process.env.REACT_APP_AUTH_API_BASE_URL);
-console.log('  - REACT_APP_DASHBOARD_API_BASE_URL:', process.env.REACT_APP_DASHBOARD_API_BASE_URL);
 console.log('  - REACT_APP_API_BASE_URL:', process.env.REACT_APP_API_BASE_URL);
 console.log('  - REACT_APP_FORMATOS_API_URL:', process.env.REACT_APP_FORMATOS_API_URL);
 console.log('  - NODE_ENV:', process.env.NODE_ENV);
@@ -25,17 +20,6 @@ console.log('  - Current protocol:', window.location.protocol);
 // Crear instancia de axios para autenticación
 const authClient = axios.create({
   baseURL: AUTH_API_BASE_URL,
-  timeout: 30000,
-  withCredentials: false,
-  headers: {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json',
-  },
-});
-
-// Crear instancia de axios para dashboard
-const dashboardClient = axios.create({
-  baseURL: DASHBOARD_API_BASE_URL,
   timeout: 30000,
   withCredentials: false,
   headers: {
@@ -100,9 +84,8 @@ const setupInterceptors = (client, serviceName) => {
   );
 };
 
-// Configurar interceptors para ambos clientes
+// Configurar interceptors para el cliente de autenticación
 setupInterceptors(authClient, 'AUTH');
-setupInterceptors(dashboardClient, 'DASHBOARD');
 
 // Definición de roles del sistema
 export const ROLES = {
@@ -548,477 +531,20 @@ class ApiService {
     }
   }
 
-  // ==================== DASHBOARD ====================
-
-  // Obtener datos del dashboard
-  async getDashboardData() {
-    try {
-      const response = await dashboardClient.get('/stats');
-      return {
-        data: response.data,
-        error: null
-      };
-    } catch (error) {
-      console.error('Error obteniendo datos del dashboard:', error);
-      return {
-        data: { participantes: 0, mensualidades: 0, total_users: 0, admin_users: 0, consulta_users: 0 },
-        error
-      };
-    }
-  }
-
-  // ==================== PARTICIPANTES ====================
-
-  // Obtener participantes
-  async getParticipantes() {
-    try {
-      const response = await dashboardClient.get('/participantes');
-      return { data: response.data || [], error: null };
-    } catch (error) {
-      console.error('Error obteniendo participantes:', error);
-      return {
-        data: [],
-        error: { message: 'Error al cargar participantes' }
-      };
-    }
-  }
-
-  async createParticipante(participanteData) {
-    try {
-      if (!participanteData.nombre || !participanteData.telefono) {
-        return {
-          data: null,
-          error: { message: 'Nombre y teléfono son campos obligatorios' }
-        };
-      }
-
-      const response = await dashboardClient.post('/participantes', participanteData);
-      return { data: response.data, error: null };
-    } catch (error) {
-      console.error('Error creando participante:', error);
-      return {
-        data: null,
-        error: {
-          message: error.response?.data?.message || error.message || 'Error al crear participante'
-        }
-      };
-    }
-  }
-
-  // Actualizar participante
-  async updateParticipante(id, participanteData) {
-    try {
-      if (!id) {
-        return {
-          data: null,
-          error: { message: 'ID de participante requerido' }
-        };
-      }
-
-      const response = await dashboardClient.put(`/participantes/${id}`, participanteData);
-      return { data: response.data, error: null };
-    } catch (error) {
-      console.error('Error actualizando participante:', error);
-      return {
-        data: null,
-        error: {
-          message: error.message || 'Error al actualizar participante'
-        }
-      };
-    }
-  }
-
-  // Eliminar participante
-  async deleteParticipante(id) {
-    try {
-      await dashboardClient.delete(`/participantes/${id}`);
-      return { error: null };
-    } catch (error) {
-      console.error('Error eliminando participante:', error);
-      return {
-        error: {
-          message: error.message || 'Error al eliminar participante'
-        }
-      };
-    }
-  }
-
-  // ==================== MENSUALIDADES ====================
-
-  // Obtener mensualidades
-  async getMensualidades() {
-    try {
-      const response = await dashboardClient.get('/mensualidades');
-      return { data: response.data || [], error: null };
-    } catch (error) {
-      console.error('Error obteniendo mensualidades:', error);
-      return {
-        data: [],
-        error: { message: 'Error al cargar mensualidades' }
-      };
-    }
-  }
-
-  // Crear nueva mensualidad
-  async createMensualidad(mensualidadData) {
-    try {
-      if (!mensualidadData.participante_id || !mensualidadData.valor) {
-        return {
-          data: null,
-          error: { message: 'Participante y valor son campos obligatorios' }
-        };
-      }
-
-      const response = await dashboardClient.post('/mensualidades', mensualidadData);
-      return { data: response.data, error: null };
-    } catch (error) {
-      console.error('Error creando mensualidad:', error);
-      return {
-        data: null,
-        error: {
-          message: error.message || 'Error al crear mensualidad'
-        }
-      };
-    }
-  }
-
-  // Actualizar mensualidad
-  async updateMensualidad(id, mensualidadData) {
-    try {
-      if (!id) {
-        return {
-          data: null,
-          error: { message: 'ID de mensualidad requerido' }
-        };
-      }
-
-      const response = await dashboardClient.put(`/mensualidades/${id}`, mensualidadData);
-      return { data: response.data, error: null };
-    } catch (error) {
-      console.error('Error actualizando mensualidad:', error);
-      return {
-        data: null,
-        error: {
-          message: error.message || 'Error al actualizar mensualidad'
-        }
-      };
-    }
-  }
-
-  // ==================== SEDES ====================
-
-  // Obtener sedes
-  async getSedes() {
-    try {
-      const response = await dashboardClient.get('/sedes');
-      return { data: response.data || [], error: null };
-    } catch (error) {
-      console.error('Error obteniendo sedes:', error);
-      return {
-        data: [],
-        error: { message: 'Error al cargar sedes' }
-      };
-    }
-  }
-
-  async createSede(sedeData) {
-    try {
-      const response = await dashboardClient.post('/sedes', sedeData);
-      return { data: response.data, error: null };
-    } catch (error) {
-      console.error('Error creando sede:', error);
-      return {
-        data: null,
-        error: {
-          message: error.response?.data?.message || error.message || 'Error al crear sede'
-        }
-      };
-    }
-  }
-
-  // Actualizar sede
-  async updateSede(id, sedeData) {
-    try {
-      if (!id) {
-        return {
-          data: null,
-          error: { message: 'ID de sede requerido' }
-        };
-      }
-
-      const response = await dashboardClient.put(`/sedes/${id}`, sedeData);
-      return { data: response.data, error: null };
-    } catch (error) {
-      console.error('Error actualizando sede:', error);
-      return {
-        data: null,
-        error: {
-          message: error.message || 'Error al actualizar sede'
-        }
-      };
-    }
-  }
-
-  // Eliminar sede
-  async deleteSede(id) {
-    try {
-      if (!id) {
-        return {
-          error: { message: 'ID de sede requerido' }
-        };
-      }
-
-      await dashboardClient.delete(`/sedes/${id}`);
-      return { error: null };
-    } catch (error) {
-      console.error('Error eliminando sede:', error);
-      return {
-        error: {
-          message: error.response?.data?.message || error.message || 'Error al eliminar sede'
-        }
-      };
-    }
-  }
-
-  // ==================== USUARIOS ====================
-
-  /**
-   * Obtener lista de usuarios
-   * @returns {Promise<{data: Array, error: Object|null}>}
-   */
-  async getUsuarios() {
-    try {
-      const response = await dashboardClient.get('/usuarios');
-      return { data: response.data || [], error: null };
-    } catch (error) {
-      console.error('Error obteniendo usuarios:', error);
-      return {
-        data: [],
-        error: { message: 'Error al cargar usuarios' }
-      };
-    }
-  }
-
-  /**
-   * Crear nuevo usuario
-   * @param {Object} usuarioData - {email, password, rol}
-   * @returns {Promise<{data: Object, error: Object|null}>}
-   */
-  async createUsuario(usuarioData) {
-    try {
-      if (!usuarioData.email || !usuarioData.password || !usuarioData.rol) {
-        return {
-          data: null,
-          error: { message: 'Email, contraseña y rol son campos obligatorios' }
-        };
-      }
-
-      const response = await dashboardClient.post('/usuarios', usuarioData);
-      return { data: response.data, error: null };
-    } catch (error) {
-      console.error('Error creando usuario:', error);
-      return {
-        data: null,
-        error: {
-          message: error.response?.data?.message || error.message || 'Error al crear usuario'
-        }
-      };
-    }
-  }
-
-  /**
-   * Actualizar usuario existente
-   * @param {number} id - ID del usuario
-   * @param {Object} usuarioData - Datos a actualizar
-   * @returns {Promise<{data: Object, error: Object|null}>}
-   */
-  async updateUsuario(id, usuarioData) {
-    try {
-      if (!id) {
-        return {
-          data: null,
-          error: { message: 'ID de usuario requerido' }
-        };
-      }
-
-      const response = await dashboardClient.put(`/usuarios/${id}`, usuarioData);
-      return { data: response.data, error: null };
-    } catch (error) {
-      console.error('Error actualizando usuario:', error);
-      return {
-        data: null,
-        error: {
-          message: error.message || 'Error al actualizar usuario'
-        }
-      };
-    }
-  }
-
-  /**
-   * Eliminar usuario
-   * @param {number} id - ID del usuario
-   * @returns {Promise<{error: Object|null}>}
-   */
-  async deleteUsuario(id) {
-    try {
-      if (!id) {
-        return {
-          error: { message: 'ID de usuario requerido' }
-        };
-      }
-
-      await dashboardClient.delete(`/usuarios/${id}`);
-      return { error: null };
-    } catch (error) {
-      console.error('Error eliminando usuario:', error);
-      return {
-        error: {
-          message: error.message || 'Error al eliminar usuario'
-        }
-      };
-    }
-  }
-
-  // ==================== ACUDIENTES ====================
-
-  /**
-   * Obtener lista de acudientes
-   * @param {Object} filters - Filtros opcionales {participante_id}
-   * @returns {Promise<{data: Array, error: Object|null}>}
-   */
-  async getAcudientes(filters = {}) {
-    try {
-      const response = await dashboardClient.get('/acudientes', { params: filters });
-      return { data: response.data.data || [], error: null };
-    } catch (error) {
-      console.error('Error obteniendo acudientes:', error);
-      return {
-        data: [],
-        error: { message: 'Error al cargar acudientes' }
-      };
-    }
-  }
-
-  /**
-   * Obtener acudientes de un participante específico
-   * @param {number} participanteId - ID del participante
-   * @returns {Promise<{data: Array, error: Object|null}>}
-   */
-  async getAcudientesByParticipante(participanteId) {
-    try {
-      if (!participanteId) {
-        return {
-          data: [],
-          error: { message: 'ID de participante requerido' }
-        };
-      }
-
-      const response = await dashboardClient.get(`/participantes/${participanteId}/acudientes`);
-      return { data: response.data || [], error: null };
-    } catch (error) {
-      console.error('Error obteniendo acudientes del participante:', error);
-      return {
-        data: [],
-        error: { message: 'Error al cargar acudientes del participante' }
-      };
-    }
-  }
-
-  /**
-   * Crear nuevo acudiente
-   * @param {Object} acudienteData - Datos del acudiente
-   * @returns {Promise<{data: Object, error: Object|null}>}
-   */
-  async createAcudiente(acudienteData) {
-    try {
-      if (!acudienteData.id_participante || !acudienteData.numero_documento ||
-          !acudienteData.nombres || !acudienteData.apellidos) {
-        return {
-          data: null,
-          error: { message: 'Participante, documento, nombres y apellidos son campos obligatorios' }
-        };
-      }
-
-      const response = await dashboardClient.post('/acudientes', acudienteData);
-      return { data: response.data, error: null };
-    } catch (error) {
-      console.error('Error creando acudiente:', error);
-      return {
-        data: null,
-        error: {
-          message: error.response?.data?.message || error.message || 'Error al crear acudiente'
-        }
-      };
-    }
-  }
-
-  /**
-   * Actualizar acudiente existente
-   * @param {number} id - ID del acudiente
-   * @param {Object} acudienteData - Datos a actualizar
-   * @returns {Promise<{data: Object, error: Object|null}>}
-   */
-  async updateAcudiente(id, acudienteData) {
-    try {
-      if (!id) {
-        return {
-          data: null,
-          error: { message: 'ID de acudiente requerido' }
-        };
-      }
-
-      const response = await dashboardClient.put(`/acudientes/${id}`, acudienteData);
-      return { data: response.data, error: null };
-    } catch (error) {
-      console.error('Error actualizando acudiente:', error);
-      return {
-        data: null,
-        error: {
-          message: error.message || 'Error al actualizar acudiente'
-        }
-      };
-    }
-  }
-
-  /**
-   * Eliminar acudiente
-   * @param {number} id - ID del acudiente
-   * @returns {Promise<{error: Object|null}>}
-   */
-  async deleteAcudiente(id) {
-    try {
-      if (!id) {
-        return {
-          error: { message: 'ID de acudiente requerido' }
-        };
-      }
-
-      await dashboardClient.delete(`/acudientes/${id}`);
-      return { error: null };
-    } catch (error) {
-      console.error('Error eliminando acudiente:', error);
-      return {
-        error: {
-          message: error.message || 'Error al eliminar acudiente'
-        }
-      };
-    }
-  }
 
   // ==================== UTILIDADES ====================
-
+  
   /**
-   * Verifica la conexión con ambos backends y proporciona estado detallado
+   * Verifica la conexión con el backend de autenticación
    * @returns {Promise<Object>} Objeto con información detallada de la conexión
    */
   async testConnection() {
     const startTime = Date.now();
     const results = {
       auth: null,
-      dashboard: null,
       overall: { success: false, message: 'Conexión fallida' }
     };
-
+  
     // Test auth service
     try {
       const authResponse = await authClient.get('/health');
@@ -1046,72 +572,33 @@ class ApiService {
         message: errorInfo.message
       };
     }
-
-    // Test dashboard service
-    try {
-      const dashboardResponse = await dashboardClient.get('/health');
-      results.dashboard = {
-        success: true,
-        connected: true,
-        responseTime: Date.now() - startTime,
-        status: dashboardResponse.status,
-        baseURL: DASHBOARD_API_BASE_URL,
-        data: dashboardResponse.data,
-        message: 'Conexión exitosa con dashboard service'
-      };
-    } catch (error) {
-      const errorInfo = generateErrorMessage(error);
-      results.dashboard = {
-        success: false,
-        connected: false,
-        responseTime: Date.now() - startTime,
-        baseURL: DASHBOARD_API_BASE_URL,
-        error: error.message || 'Error de conexión',
-        errorType: errorInfo.type,
-        isCorsError: errorInfo.isCorsError,
-        isNetworkError: errorInfo.isNetworkError,
-        suggestions: errorInfo.suggestions,
-        message: errorInfo.message
-      };
-    }
-
+  
     // Overall result
     const authSuccess = results.auth.success;
-    const dashboardSuccess = results.dashboard.success;
-
-    if (authSuccess && dashboardSuccess) {
+  
+    if (authSuccess) {
       results.overall = {
         success: true,
-        message: 'Conexión exitosa con ambos servicios'
-      };
-    } else if (authSuccess) {
-      results.overall = {
-        success: false,
-        message: 'Auth service OK, pero dashboard service falló'
-      };
-    } else if (dashboardSuccess) {
-      results.overall = {
-        success: false,
-        message: 'Dashboard service OK, pero auth service falló'
+        message: 'Conexión exitosa con el servicio de autenticación'
       };
     } else {
       results.overall = {
         success: false,
-        message: 'Ambos servicios no están disponibles'
+        message: 'El servicio de autenticación no está disponible'
       };
     }
-
+  
     return results;
   }
-
+  
   /**
-   * Verifica si los backends están disponibles antes de operaciones críticas
+   * Verifica si el backend de autenticación está disponible antes de operaciones críticas
    * @param {number} timeout - Timeout en milisegundos (por defecto 5000ms)
-   * @returns {Promise<Object>} Objeto con estado de ambos servicios
+   * @returns {Promise<Object>} Objeto con estado del servicio
    */
   async isBackendReachable(timeout = 5000) {
-    const results = { auth: false, dashboard: false };
-
+    const results = { auth: false };
+  
     // Check auth service
     try {
       const authCheck = axios.create({
@@ -1124,31 +611,17 @@ class ApiService {
     } catch (error) {
       console.warn('Auth service no disponible:', error.message);
     }
-
-    // Check dashboard service
-    try {
-      const dashboardCheck = axios.create({
-        baseURL: DASHBOARD_API_BASE_URL,
-        timeout: timeout,
-        headers: { 'Accept': 'application/json' }
-      });
-      await dashboardCheck.get('/health');
-      results.dashboard = true;
-    } catch (error) {
-      console.warn('Dashboard service no disponible:', error.message);
-    }
-
+  
     return results;
   }
-
+  
   // Obtener configuración de la API
   getApiConfig() {
     return {
       authBaseURL: AUTH_API_BASE_URL,
-      dashboardBaseURL: DASHBOARD_API_BASE_URL,
       hasToken: !!localStorage.getItem('authToken'),
       environment: process.env.NODE_ENV,
-      isConfigured: !!(AUTH_API_BASE_URL && DASHBOARD_API_BASE_URL)
+      isConfigured: !!AUTH_API_BASE_URL
     };
   }
 }
@@ -1157,5 +630,5 @@ class ApiService {
 export const api = new ApiService();
 export default api;
 
-// Exportar clientes axios para uso directo si es necesario
-export { authClient, dashboardClient };
+// Exportar cliente axios para uso directo si es necesario
+export { authClient };
