@@ -3,7 +3,7 @@
   "type": "dockerfile",
   "dockerfile": "./Dockerfile",
   "buildContext": ".",
-  "port": 80,
+  "port": 8080,
   "healthCheck": {
     "path": "/health",
     "interval": 30,
@@ -12,10 +12,10 @@
   },
   "env": {
     "NODE_ENV": "production",
-    "REACT_APP_AUTH_API_BASE_URL": "https://todoporunalma.org/api",
-    "REACT_APP_DASHBOARD_API_BASE_URL": "https://todoporunalma.org/api",
-    "REACT_APP_API_BASE_URL": "https://todoporunalma.org/api",
-    "REACT_APP_FORMATOS_API_URL": "https://todoporunalma.org/api",
+    "REACT_APP_AUTH_API_BASE_URL": "https://todoporunalma.org/auth",
+    "REACT_APP_DASHBOARD_API_BASE_URL": "https://todoporunalma.org/dashboard",
+    "REACT_APP_API_BASE_URL": "https://todoporunalma.org/dashboard",
+    "REACT_APP_FORMATOS_API_URL": "https://todoporunalma.org/formatos",
     "REACT_APP_CORS_ORIGINS": "https://todoporunalma.org,https://www.todoporunalma.org"
   }
 }

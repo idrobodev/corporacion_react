@@ -1,10 +1,13 @@
 import axios from 'axios';
 
-// Configuración de la API de formatos
+// Configuración de la API de formatos - apunta al servicio dedicado de formatos
 const FORMATOS_API_BASE_URL = process.env.REACT_APP_FORMATOS_API_URL ||
-  'http://localhost:8001/api';
+  `${window.location.protocol}//${window.location.hostname}/formatos`;
 
 console.log('🔧 FORMATOS_API_BASE_URL configurada como:', FORMATOS_API_BASE_URL);
+console.log('🔧 FORMATOS API DIAGNOSTICS:');
+console.log('  - REACT_APP_FORMATOS_API_URL:', process.env.REACT_APP_FORMATOS_API_URL);
+console.log('  - Fallback URL:', 'http://localhost:8001/api');
 
 // Crear instancia de axios para la API de formatos
 const formatosClient = axios.create({

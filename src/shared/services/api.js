@@ -2,15 +2,25 @@
 import axios from 'axios';
 
 // Configuración base de las APIs
-// URLs para servicios separados
+// URLs para servicios separados - FastAPI backend con auth y dashboard
 const AUTH_API_BASE_URL = process.env.REACT_APP_AUTH_API_BASE_URL ||
-  `${window.location.protocol}//${window.location.hostname}:8080/api`;
+  `${window.location.protocol}//${window.location.hostname}/auth`;
 
 const DASHBOARD_API_BASE_URL = process.env.REACT_APP_DASHBOARD_API_BASE_URL ||
-  `${window.location.protocol}//${window.location.hostname}:8081/api`;
+  `${window.location.protocol}//${window.location.hostname}/dashboard`;
 
 console.log('🔧 AUTH_API_BASE_URL configurada como:', AUTH_API_BASE_URL);
 console.log('🔧 DASHBOARD_API_BASE_URL configurada como:', DASHBOARD_API_BASE_URL);
+
+// Additional diagnostic logging
+console.log('🔧 API CONFIGURATION DIAGNOSTICS:');
+console.log('  - REACT_APP_AUTH_API_BASE_URL:', process.env.REACT_APP_AUTH_API_BASE_URL);
+console.log('  - REACT_APP_DASHBOARD_API_BASE_URL:', process.env.REACT_APP_DASHBOARD_API_BASE_URL);
+console.log('  - REACT_APP_API_BASE_URL:', process.env.REACT_APP_API_BASE_URL);
+console.log('  - REACT_APP_FORMATOS_API_URL:', process.env.REACT_APP_FORMATOS_API_URL);
+console.log('  - NODE_ENV:', process.env.NODE_ENV);
+console.log('  - Current hostname:', window.location.hostname);
+console.log('  - Current protocol:', window.location.protocol);
 
 // Crear instancia de axios para autenticación
 const authClient = axios.create({
@@ -343,33 +353,33 @@ class ApiService {
     console.log('🔐 Starting login request...');
     console.log('📧 Email:', email);
     console.log('🌐 Auth API URL:', AUTH_API_BASE_URL);
-    console.log('🔗 Full login URL:', AUTH_API_BASE_URL + '/auth/login');
+    console.log('🔗 Full login URL:', AUTH_API_BASE_URL + '/login');
 
     const startTime = Date.now();
 
     try {
       console.log('📤 Sending login request...');
-      const response = await authClient.post('/auth/login', { email, password });
+      const response = await authClient.post('/login', { email, password });
       const responseTime = Date.now() - startTime;
       console.log('✅ Login request completed in', responseTime, 'ms');
       console.log('📊 Response status:', response.status);
 
-      const { data: responseData, error: responseError } = response.data;
+      // FastAPI returns data directly in response.data, not nested
+      const responseData = response.data;
       console.log('📦 Response data:', responseData);
 
-      if (responseError) {
-        console.error('❌ Server error in response:', responseError);
-        const error = new Error(responseError.message || 'Error en el servidor');
-        error.serverError = responseError;
-        throw error;
+      // Check for error in FastAPI response format
+      if (responseData.error) {
+        console.error('❌ Server error in response:', responseData.error);
+        throw new Error(responseData.error.message || 'Error en el servidor');
       }
 
-      if (!responseData) {
-        console.error('❌ Invalid server response: no data');
+      if (!responseData.data) {
+        console.error('❌ Invalid server response: no data field');
         throw new Error('Respuesta del servidor inválida');
       }
 
-      const { token, user } = responseData;
+      const { token, user } = responseData.data;
       console.log('🔑 Token received:', !!token);
       console.log('👤 User received:', !!user);
 
@@ -395,7 +405,11 @@ class ApiService {
         console.error('   Status Text:', error.response.statusText);
         console.error('   Headers:', error.response.headers);
         console.error('   Data:', error.response.data);
-        const serverMessage = error.response.data?.error?.message || error.response.data?.message;
+
+        // Handle FastAPI error format
+        const serverMessage = error.response.data?.detail ||
+                            error.response.data?.message ||
+                            error.response.data?.error?.message;
         throw new Error(serverMessage || 'Error del servidor');
       } else if (error.request) {
         console.error('🌐 Network Error - No response received:');
@@ -412,7 +426,7 @@ class ApiService {
   // Cerrar sesión
   async logout() {
     try {
-      await authClient.post('/auth/logout');
+      await authClient.post('/logout');
 
       // Limpiar localStorage
       localStorage.removeItem('authToken');
@@ -432,7 +446,7 @@ class ApiService {
   // Restablecer contraseña
   async resetPassword(email) {
     try {
-      const response = await authClient.post('/auth/reset-password', { email });
+      const response = await authClient.post('/reset-password', { email });
       return { data: response.data, error: null };
     } catch (error) {
       console.error('Error en reset password:', error);
@@ -479,7 +493,7 @@ class ApiService {
   // Actualizar perfil de usuario
   async updateProfile(profileData) {
     try {
-      const response = await authClient.put('/auth/profile', profileData);
+      const response = await authClient.put('/profile', profileData);
 
       // Actualizar usuario en localStorage
       const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
@@ -501,8 +515,8 @@ class ApiService {
   // Verificar permisos del usuario
   async hasPermission(requiredRole) {
     try {
-      // Consultar endpoint real en backend
-      const response = await authClient.get('/auth/permission', {
+      // Consultar endpoint real en backend FastAPI
+      const response = await authClient.get('/permission', {
         params: { role: requiredRole }
       });
 
@@ -547,7 +561,7 @@ class ApiService {
     } catch (error) {
       console.error('Error obteniendo datos del dashboard:', error);
       return {
-        data: { participantes: 0, mensualidades: 0 },
+        data: { participantes: 0, mensualidades: 0, total_users: 0, admin_users: 0, consulta_users: 0 },
         error
       };
     }
@@ -559,7 +573,7 @@ class ApiService {
   async getParticipantes() {
     try {
       const response = await dashboardClient.get('/participantes');
-      return { data: response.data.data || [], error: null };
+      return { data: response.data || [], error: null };
     } catch (error) {
       console.error('Error obteniendo participantes:', error);
       return {
