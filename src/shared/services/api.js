@@ -4,10 +4,10 @@ import axios from 'axios';
 // Configuración base de las APIs
 // URLs para servicios separados - FastAPI backend con auth y dashboard
 const AUTH_API_BASE_URL = process.env.REACT_APP_AUTH_API_BASE_URL ||
-  'https://corporacion-fastapiauth-16wld1.dokploy.app';
+  'https://todoporunalma.org/auth';
 
 const DASHBOARD_API_BASE_URL = process.env.REACT_APP_DASHBOARD_API_BASE_URL ||
-  'https://corporacion-fastapidashboard-1q8q7y.dokploy.app';
+  'https://todoporunalma.org/dashboard';
 
 console.log('🔧 AUTH_API_BASE_URL configurada como:', AUTH_API_BASE_URL);
 console.log('🔧 DASHBOARD_API_BASE_URL configurada como:', DASHBOARD_API_BASE_URL);
