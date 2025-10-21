@@ -359,7 +359,7 @@ class ApiService {
 
     try {
       console.log('📤 Sending login request...');
-      const response = await authClient.post('/login', { email, password });
+      const response = await authClient.post('/api/auth/login', { email, password });
       const responseTime = Date.now() - startTime;
       console.log('✅ Login request completed in', responseTime, 'ms');
       console.log('📊 Response status:', response.status);
@@ -426,7 +426,7 @@ class ApiService {
   // Cerrar sesión
   async logout() {
     try {
-      await authClient.post('/logout');
+      await authClient.post('/api/auth/logout');
 
       // Limpiar localStorage
       localStorage.removeItem('authToken');
@@ -446,7 +446,7 @@ class ApiService {
   // Restablecer contraseña
   async resetPassword(email) {
     try {
-      const response = await authClient.post('/reset-password', { email });
+      const response = await authClient.post('/api/auth/reset-password', { email });
       return { data: response.data, error: null };
     } catch (error) {
       console.error('Error en reset password:', error);
@@ -493,7 +493,7 @@ class ApiService {
   // Actualizar perfil de usuario
   async updateProfile(profileData) {
     try {
-      const response = await authClient.put('/profile', profileData);
+      const response = await authClient.put('/api/auth/profile', profileData);
 
       // Actualizar usuario en localStorage
       const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
@@ -516,7 +516,7 @@ class ApiService {
   async hasPermission(requiredRole) {
     try {
       // Consultar endpoint real en backend FastAPI
-      const response = await authClient.get('/permission', {
+      const response = await authClient.get('/api/auth/permission', {
         params: { role: requiredRole }
       });
 
@@ -553,7 +553,7 @@ class ApiService {
   // Obtener datos del dashboard
   async getDashboardData() {
     try {
-      const response = await dashboardClient.get('/dashboard/stats');
+      const response = await dashboardClient.get('/api/dashboard/stats');
       return {
         data: response.data,
         error: null
@@ -572,7 +572,7 @@ class ApiService {
   // Obtener participantes
   async getParticipantes() {
     try {
-      const response = await dashboardClient.get('/participantes');
+      const response = await dashboardClient.get('/api/participantes');
       return { data: response.data || [], error: null };
     } catch (error) {
       console.error('Error obteniendo participantes:', error);
@@ -592,7 +592,7 @@ class ApiService {
         };
       }
 
-      const response = await dashboardClient.post('/participantes', participanteData);
+      const response = await dashboardClient.post('/api/participantes', participanteData);
       return { data: response.data, error: null };
     } catch (error) {
       console.error('Error creando participante:', error);
@@ -615,7 +615,7 @@ class ApiService {
         };
       }
 
-      const response = await dashboardClient.put(`/participantes/${id}`, participanteData);
+      const response = await dashboardClient.put(`/api/participantes/${id}`, participanteData);
       return { data: response.data, error: null };
     } catch (error) {
       console.error('Error actualizando participante:', error);
@@ -631,7 +631,7 @@ class ApiService {
   // Eliminar participante
   async deleteParticipante(id) {
     try {
-      await dashboardClient.delete(`/participantes/${id}`);
+      await dashboardClient.delete(`/api/participantes/${id}`);
       return { error: null };
     } catch (error) {
       console.error('Error eliminando participante:', error);
@@ -648,8 +648,8 @@ class ApiService {
   // Obtener mensualidades
   async getMensualidades() {
     try {
-      const response = await dashboardClient.get('/mensualidades');
-      return { data: response.data.data || [], error: null };
+      const response = await dashboardClient.get('/api/mensualidades');
+      return { data: response.data || [], error: null };
     } catch (error) {
       console.error('Error obteniendo mensualidades:', error);
       return {
@@ -669,7 +669,7 @@ class ApiService {
         };
       }
 
-      const response = await dashboardClient.post('/mensualidades', mensualidadData);
+      const response = await dashboardClient.post('/api/mensualidades', mensualidadData);
       return { data: response.data, error: null };
     } catch (error) {
       console.error('Error creando mensualidad:', error);
@@ -692,7 +692,7 @@ class ApiService {
         };
       }
 
-      const response = await dashboardClient.put(`/mensualidades/${id}`, mensualidadData);
+      const response = await dashboardClient.put(`/api/mensualidades/${id}`, mensualidadData);
       return { data: response.data, error: null };
     } catch (error) {
       console.error('Error actualizando mensualidad:', error);
@@ -710,8 +710,8 @@ class ApiService {
   // Obtener sedes
   async getSedes() {
     try {
-      const response = await dashboardClient.get('/sedes');
-      return { data: response.data.data || [], error: null };
+      const response = await dashboardClient.get('/api/sedes');
+      return { data: response.data || [], error: null };
     } catch (error) {
       console.error('Error obteniendo sedes:', error);
       return {
@@ -723,7 +723,7 @@ class ApiService {
 
   async createSede(sedeData) {
     try {
-      const response = await dashboardClient.post('/sedes', sedeData);
+      const response = await dashboardClient.post('/api/sedes', sedeData);
       return { data: response.data, error: null };
     } catch (error) {
       console.error('Error creando sede:', error);
@@ -746,7 +746,7 @@ class ApiService {
         };
       }
 
-      const response = await dashboardClient.put(`/sedes/${id}`, sedeData);
+      const response = await dashboardClient.put(`/api/sedes/${id}`, sedeData);
       return { data: response.data, error: null };
     } catch (error) {
       console.error('Error actualizando sede:', error);
@@ -768,7 +768,7 @@ class ApiService {
         };
       }
 
-      await dashboardClient.delete(`/sedes/${id}`);
+      await dashboardClient.delete(`/api/sedes/${id}`);
       return { error: null };
     } catch (error) {
       console.error('Error eliminando sede:', error);
@@ -788,7 +788,7 @@ class ApiService {
    */
   async getUsuarios() {
     try {
-      const response = await dashboardClient.get('/usuarios');
+      const response = await dashboardClient.get('/api/usuarios');
       return { data: response.data || [], error: null };
     } catch (error) {
       console.error('Error obteniendo usuarios:', error);
@@ -813,7 +813,7 @@ class ApiService {
         };
       }
 
-      const response = await dashboardClient.post('/usuarios', usuarioData);
+      const response = await dashboardClient.post('/api/usuarios', usuarioData);
       return { data: response.data, error: null };
     } catch (error) {
       console.error('Error creando usuario:', error);
@@ -841,7 +841,7 @@ class ApiService {
         };
       }
 
-      const response = await dashboardClient.put(`/usuarios/${id}`, usuarioData);
+      const response = await dashboardClient.put(`/api/usuarios/${id}`, usuarioData);
       return { data: response.data, error: null };
     } catch (error) {
       console.error('Error actualizando usuario:', error);
@@ -867,7 +867,7 @@ class ApiService {
         };
       }
 
-      await dashboardClient.delete(`/usuarios/${id}`);
+      await dashboardClient.delete(`/api/usuarios/${id}`);
       return { error: null };
     } catch (error) {
       console.error('Error eliminando usuario:', error);
@@ -888,7 +888,7 @@ class ApiService {
    */
   async getAcudientes(filters = {}) {
     try {
-      const response = await dashboardClient.get('/acudientes', { params: filters });
+      const response = await dashboardClient.get('/api/acudientes', { params: filters });
       return { data: response.data.data || [], error: null };
     } catch (error) {
       console.error('Error obteniendo acudientes:', error);
@@ -913,7 +913,7 @@ class ApiService {
         };
       }
 
-      const response = await dashboardClient.get(`/participantes/${participanteId}/acudientes`);
+      const response = await dashboardClient.get(`/api/participantes/${participanteId}/acudientes`);
       return { data: response.data || [], error: null };
     } catch (error) {
       console.error('Error obteniendo acudientes del participante:', error);
@@ -939,7 +939,7 @@ class ApiService {
         };
       }
 
-      const response = await dashboardClient.post('/acudientes', acudienteData);
+      const response = await dashboardClient.post('/api/acudientes', acudienteData);
       return { data: response.data, error: null };
     } catch (error) {
       console.error('Error creando acudiente:', error);
@@ -967,7 +967,7 @@ class ApiService {
         };
       }
 
-      const response = await dashboardClient.put(`/acudientes/${id}`, acudienteData);
+      const response = await dashboardClient.put(`/api/acudientes/${id}`, acudienteData);
       return { data: response.data, error: null };
     } catch (error) {
       console.error('Error actualizando acudiente:', error);
@@ -993,7 +993,7 @@ class ApiService {
         };
       }
 
-      await dashboardClient.delete(`/acudientes/${id}`);
+      await dashboardClient.delete(`/api/acudientes/${id}`);
       return { error: null };
     } catch (error) {
       console.error('Error eliminando acudiente:', error);

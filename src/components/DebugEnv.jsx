@@ -14,6 +14,9 @@ const DebugEnv = () => {
     NODE_ENV: process.env.NODE_ENV,
   };
 
+  // Add console logging for debugging
+  console.log('🔧 DEBUG ENV VARS:', envVars);
+
   return (
     <div style={{
       position: 'fixed',
