@@ -553,7 +553,7 @@ class ApiService {
   // Obtener datos del dashboard
   async getDashboardData() {
     try {
-      const response = await dashboardClient.get('/dashboard/stats');
+      const response = await dashboardClient.get('/api/dashboard/dashboard/stats');
       return {
         data: response.data,
         error: null
