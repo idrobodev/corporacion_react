@@ -7,7 +7,7 @@ const AUTH_API_BASE_URL = process.env.REACT_APP_AUTH_API_BASE_URL ||
   `${window.location.protocol}//${window.location.hostname}/auth`;
 
 const DASHBOARD_API_BASE_URL = process.env.REACT_APP_DASHBOARD_API_BASE_URL ||
-  `${window.location.protocol}//${window.location.hostname}/api/dashboard`;
+  `${window.location.protocol}//${window.location.hostname}/dashboard`;
 
 console.log('🔧 AUTH_API_BASE_URL configurada como:', AUTH_API_BASE_URL);
 console.log('🔧 DASHBOARD_API_BASE_URL configurada como:', DASHBOARD_API_BASE_URL);
