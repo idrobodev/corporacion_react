@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "3001:80"
+      - "3001:8080"
     environment:
       - NODE_ENV=production
       - REACT_APP_AUTH_API_BASE_URL=${REACT_APP_AUTH_API_BASE_URL}
