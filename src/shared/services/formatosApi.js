@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Configuración de la API de formatos - apunta al servicio dedicado de formatos
 const FORMATOS_API_BASE_URL = process.env.REACT_APP_FORMATOS_API_URL ||
-  `${window.location.protocol}//${window.location.hostname}/formatos`;
+  `${window.location.protocol}//${window.location.hostname}:8082`;
 
 console.log('🔧 FORMATOS_API_BASE_URL configurada como:', FORMATOS_API_BASE_URL);
 console.log('🔧 FORMATOS API DIAGNOSTICS:');
@@ -58,7 +58,7 @@ class FormatosApiService {
    */
   async listFiles(path = "") {
     try {
-      const response = await formatosClient.get('/files/list', {
+      const response = await formatosClient.get('/list', {
         params: { path }
       });
       return response.data;
@@ -79,7 +79,7 @@ class FormatosApiService {
       const formData = new FormData();
       formData.append('file', file);
 
-      const response = await formatosClient.post('/files/upload', formData, {
+      const response = await formatosClient.post('/upload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -99,7 +99,7 @@ class FormatosApiService {
    */
   async downloadFile(fileId) {
     try {
-      const response = await formatosClient.get(`/files/download/${fileId}`, {
+      const response = await formatosClient.get(`/download/${fileId}`, {
         responseType: 'blob',
       });
       return response.data;
@@ -116,7 +116,7 @@ class FormatosApiService {
    */
   async deleteFile(fileId) {
     try {
-      const response = await formatosClient.delete(`/files/${fileId}`);
+      const response = await formatosClient.delete(`/${fileId}`);
       return response.data;
     } catch (error) {
       console.error('Error eliminando archivo:', error);
