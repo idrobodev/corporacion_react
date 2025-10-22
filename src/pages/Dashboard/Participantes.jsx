@@ -47,8 +47,8 @@ const Participantes = React.memo(() => {
         throw new Error(result.error.message || 'Error al cargar participantes');
       }
 
-      // The API returns {data: [...], error: null}, so result.data is already the array
-      const participantesData = Array.isArray(result.data) ? result.data : [];
+      // The API returns {data: {data: [...], error: null}, error: null}, so we need result.data.data
+      const participantesData = Array.isArray(result.data?.data) ? result.data.data : [];
       console.log('🔄 participantesData:', participantesData);
       console.log('🔄 participantesData.length:', participantesData.length);
       setParticipantes(participantesData);
