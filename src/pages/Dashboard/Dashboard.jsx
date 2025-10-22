@@ -18,7 +18,7 @@ const DashboardComponent = () => {
         // Load basic stats
         const dashboardResponse = await dbService.getDashboardData();
         console.log('Dashboard API Response:', dashboardResponse);
-        const { participantes, mensualidades } = dashboardResponse.data?.data?.data || {};
+        const { participantes, mensualidades } = dashboardResponse.data?.data || {};
         console.log('Extracted data:', { participantes, mensualidades });
         
         // Load acudientes count
