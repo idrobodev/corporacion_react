@@ -32,7 +32,7 @@ const SedesComponent = () => {
         throw new Error(result.error.message || 'Error al cargar sedes');
       }
 
-      const sedesData = Array.isArray(result.data) ? result.data : [];
+      const sedesData = Array.isArray(result.data?.data) ? result.data.data : [];
       setSedes(sedesData);
       console.log('✅ Sedes cargadas:', sedesData.length);
     } catch (err) {
@@ -78,8 +78,8 @@ const SedesComponent = () => {
   const toggleEstado = async (id, newEstado) => {
     try {
       await dbService.updateSede(id, { estado: newEstado });
-      const { data } = await dbService.getSedes();
-      setSedes(data || []);
+      const result = await dbService.getSedes();
+      setSedes(result.data?.data || []);
     } catch (err) {
       console.error('Error updating status:', err);
     }
@@ -94,8 +94,8 @@ const SedesComponent = () => {
       if (participantesResult.error) {
         throw new Error('Error al verificar participantes asociados');
       }
-      
-      const participantesEnSede = (participantesResult.data || []).filter(
+
+      const participantesEnSede = (participantesResult.data?.data || []).filter(
         p => p.id_sede === id || p.sede_id === id || p.sedeId === id
       );
       

@@ -43,7 +43,7 @@ const AcudientesComponent = () => {
         throw new Error(result.error.message || 'Error al cargar acudientes');
       }
 
-      const acudientesData = Array.isArray(result.data) ? result.data : [];
+      const acudientesData = Array.isArray(result.data?.data) ? result.data.data : [];
       setAcudientes(acudientesData);
       console.log('✅ Acudientes cargados:', acudientesData.length);
     } catch (err) {
@@ -67,7 +67,7 @@ const AcudientesComponent = () => {
         return;
       }
 
-      const participantesData = Array.isArray(result.data) ? result.data : [];
+      const participantesData = Array.isArray(result.data?.data) ? result.data.data : [];
       setParticipantes(participantesData);
       console.log('✅ Participantes cargados:', participantesData.length);
     } catch (err) {
