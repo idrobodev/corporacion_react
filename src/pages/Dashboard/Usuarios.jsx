@@ -38,8 +38,8 @@ const UsuariosComponent = () => {
         throw new Error(result.error.message || 'Error al cargar usuarios');
       }
 
-      // La respuesta es {data: {data: [...], error: null}, error: null}
-      const usuariosData = Array.isArray(result.data?.data) ? result.data.data : [];
+      // La respuesta es {data: [...], error: null}
+      const usuariosData = Array.isArray(result.data) ? result.data : [];
 
       setUsuarios(usuariosData);
       console.log('✅ Usuarios cargados:', usuariosData.length);
