@@ -4,7 +4,7 @@ import axios from 'axios';
 // Configuración base de las APIs
 // Solo servicio de autenticación
 const AUTH_API_BASE_URL = process.env.REACT_APP_AUTH_API_BASE_URL ||
-  'https://todoporunalma.org/auth';
+  'https://todoporunalma.org/api/auth';
 
 console.log('🔧 AUTH_API_BASE_URL configurada como:', AUTH_API_BASE_URL);
 
@@ -615,6 +615,44 @@ class ApiService {
     return results;
   }
   
+  // ==================== DASHBOARD ====================
+
+  // Obtener datos del dashboard
+  async getDashboardData() {
+    try {
+      const response = await authClient.get('/dashboard/dashboard/stats');
+      return { data: response.data, error: null };
+    } catch (error) {
+      console.error('Error obteniendo datos del dashboard:', error);
+      return {
+        data: null,
+        error: {
+          message: error.message || 'Error al obtener datos del dashboard'
+        }
+      };
+    }
+  }
+
+  // ==================== ACUDIENTES ====================
+
+  // Obtener lista de acudientes
+  async getAcudientes(filters) {
+    try {
+      const response = await authClient.get('/dashboard/acudientes', {
+        params: filters
+      });
+      return { data: response.data, error: null };
+    } catch (error) {
+      console.error('Error obteniendo acudientes:', error);
+      return {
+        data: null,
+        error: {
+          message: error.message || 'Error al obtener acudientes'
+        }
+      };
+    }
+  }
+
   // Obtener configuración de la API
   getApiConfig() {
     return {
