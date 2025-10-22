@@ -7,6 +7,7 @@ const AUTH_API_BASE_URL = process.env.REACT_APP_AUTH_API_BASE_URL ||
   'https://todoporunalma.org/api/auth';
 
 console.log('🔧 AUTH_API_BASE_URL configurada como:', AUTH_API_BASE_URL);
+console.log('🔧 Full login URL will be:', AUTH_API_BASE_URL + '/auth/login');
 
 // Additional diagnostic logging
 console.log('🔧 API CONFIGURATION DIAGNOSTICS:');
