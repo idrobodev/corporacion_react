@@ -703,6 +703,24 @@ class ApiService {
     }
   }
 
+  // ==================== SEDES ====================
+
+  // Obtener lista de sedes
+  async getSedes() {
+    try {
+      const response = await dashboardClient.get('/sedes');
+      return { data: response.data, error: null };
+    } catch (error) {
+      console.error('Error obteniendo sedes:', error);
+      return {
+        data: null,
+        error: {
+          message: error.message || 'Error al obtener sedes'
+        }
+      };
+    }
+  }
+
   // ==================== ACUDIENTES ====================
 
   // Obtener lista de acudientes
