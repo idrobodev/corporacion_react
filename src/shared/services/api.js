@@ -685,6 +685,24 @@ class ApiService {
     }
   }
 
+  // ==================== MENSUALIDADES ====================
+
+  // Obtener lista de mensualidades
+  async getMensualidades() {
+    try {
+      const response = await dashboardClient.get('/mensualidades');
+      return { data: response.data, error: null };
+    } catch (error) {
+      console.error('Error obteniendo mensualidades:', error);
+      return {
+        data: null,
+        error: {
+          message: error.message || 'Error al obtener mensualidades'
+        }
+      };
+    }
+  }
+
   // ==================== ACUDIENTES ====================
 
   // Obtener lista de acudientes
