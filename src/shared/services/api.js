@@ -634,6 +634,24 @@ class ApiService {
     }
   }
 
+  // ==================== USUARIOS ====================
+
+  // Obtener lista de usuarios
+  async getUsuarios() {
+    try {
+      const response = await authClient.get('/usuarios');
+      return { data: response.data, error: null };
+    } catch (error) {
+      console.error('Error obteniendo usuarios:', error);
+      return {
+        data: null,
+        error: {
+          message: error.message || 'Error al obtener usuarios'
+        }
+      };
+    }
+  }
+
   // ==================== ACUDIENTES ====================
 
   // Obtener lista de acudientes
