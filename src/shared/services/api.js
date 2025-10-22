@@ -652,6 +652,24 @@ class ApiService {
     }
   }
 
+  // ==================== PARTICIPANTES ====================
+
+  // Obtener lista de participantes
+  async getParticipantes() {
+    try {
+      const response = await authClient.get('/participantes');
+      return { data: response.data, error: null };
+    } catch (error) {
+      console.error('Error obteniendo participantes:', error);
+      return {
+        data: null,
+        error: {
+          message: error.message || 'Error al obtener participantes'
+        }
+      };
+    }
+  }
+
   // ==================== ACUDIENTES ====================
 
   // Obtener lista de acudientes

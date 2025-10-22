@@ -20,7 +20,23 @@ curl -k -s -o /dev/null -w "Status: %{http_code}\n" https://todoporunalma.org/ap
 echo ""
 
 echo "Testing Dashboard API (/api/dashboard/)..."
+curl -k -s -o /dev/null -w "Status: %{http_code}\n" https://todoporunalma.org/api/dashboard/health
+echo ""
+
+echo "Testing Dashboard API root (/api/dashboard/)..."
 curl -k -s -o /dev/null -w "Status: %{http_code}\n" https://todoporunalma.org/api/dashboard/
+echo ""
+
+echo "Testing Dashboard API stats (/api/dashboard/dashboard/stats)..."
+curl -k -s -X GET \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbkBleGFtcGxlLmNvbSIsInJvbGUiOiJBRE1JTklTVFJBRE9SIiwiZXhwIjoxNzYxMTQ0MDM1fQ.6uItIcSSqUh73USBKmlgre3qHrrQzr3eHaySRrAazLk" \
+  https://todoporunalma.org/api/dashboard/dashboard/stats | jq '.' 2>/dev/null || echo "Response: $(curl -k -s -X GET -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbkBleGFtcGxlLmNvbSIsInJvbGUiOiJBRE1JTklTVFJBRE9SIiwiZXhwIjoxNzYxMTQ0MDM1fQ.6uItIcSSqUh73USBKmlgre3qHrrQzr3eHaySRrAazLk" https://todoporunalma.org/api/dashboard/dashboard/stats)"
+echo ""
+
+echo "Testing Dashboard API participantes (/api/dashboard/participantes)..."
+curl -k -s -X GET \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbkBleGFtcGxlLmNvbSIsInJvbGUiOiJBRE1JTklTVFJBRE9SIiwiZXhwIjoxNzYxMTQ0MDM1fQ.6uItIcSSqUh73USBKmlgre3qHrrQzr3eHaySRrAazLk" \
+  https://todoporunalma.org/api/dashboard/participantes | jq '.' 2>/dev/null || echo "Response: $(curl -k -s -X GET -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbkBleGFtcGxlLmNvbSIsInJvbGUiOiJBRE1JTklTVFJBRE9SIiwiZXhwIjoxNzYxMTQ0MDM1fQ.6uItIcSSqUh73USBKmlgre3qHrrQzr3eHaySRrAazLk" https://todoporunalma.org/api/dashboard/participantes)"
 echo ""
 
 echo "Testing Login with admin@example.com..."
