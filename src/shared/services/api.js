@@ -2,12 +2,15 @@
 import axios from 'axios';
 
 // Configuración base de las APIs
-// Solo servicio de autenticación
 const AUTH_API_BASE_URL = process.env.REACT_APP_AUTH_API_BASE_URL ||
   'https://todoporunalma.org/api/auth';
 
+const DASHBOARD_API_BASE_URL = process.env.REACT_APP_DASHBOARD_API_BASE_URL ||
+  'https://todoporunalma.org/api/dashboard';
+
 console.log('🔧 AUTH_API_BASE_URL configurada como:', AUTH_API_BASE_URL);
-console.log('🔧 Full login URL will be:', AUTH_API_BASE_URL + '/auth/login');
+console.log('🔧 DASHBOARD_API_BASE_URL configurada como:', DASHBOARD_API_BASE_URL);
+console.log('🔧 Full login URL will be:', AUTH_API_BASE_URL + '/login');
 
 // Additional diagnostic logging
 console.log('🔧 API CONFIGURATION DIAGNOSTICS:');
@@ -21,6 +24,17 @@ console.log('  - Current protocol:', window.location.protocol);
 // Crear instancia de axios para autenticación
 const authClient = axios.create({
   baseURL: AUTH_API_BASE_URL,
+  timeout: 30000,
+  withCredentials: false,
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+  },
+});
+
+// Crear instancia de axios para dashboard
+const dashboardClient = axios.create({
+  baseURL: DASHBOARD_API_BASE_URL,
   timeout: 30000,
   withCredentials: false,
   headers: {
@@ -85,8 +99,9 @@ const setupInterceptors = (client, serviceName) => {
   );
 };
 
-// Configurar interceptors para el cliente de autenticación
+// Configurar interceptors para los clientes
 setupInterceptors(authClient, 'AUTH');
+setupInterceptors(dashboardClient, 'DASHBOARD');
 
 // Definición de roles del sistema
 export const ROLES = {
@@ -621,7 +636,7 @@ class ApiService {
   // Obtener datos del dashboard
   async getDashboardData() {
     try {
-      const response = await authClient.get('/stats');
+      const response = await dashboardClient.get('/dashboard/stats');
       return { data: response.data, error: null };
     } catch (error) {
       console.error('Error obteniendo datos del dashboard:', error);
@@ -657,7 +672,7 @@ class ApiService {
   // Obtener lista de participantes
   async getParticipantes() {
     try {
-      const response = await authClient.get('/participantes');
+      const response = await dashboardClient.get('/participantes');
       return { data: response.data, error: null };
     } catch (error) {
       console.error('Error obteniendo participantes:', error);
@@ -675,7 +690,7 @@ class ApiService {
   // Obtener lista de acudientes
   async getAcudientes(filters) {
     try {
-      const response = await authClient.get('/dashboard/acudientes', {
+      const response = await dashboardClient.get('/acudientes', {
         params: filters
       });
       return { data: response.data, error: null };
@@ -694,9 +709,10 @@ class ApiService {
   getApiConfig() {
     return {
       authBaseURL: AUTH_API_BASE_URL,
+      dashboardBaseURL: DASHBOARD_API_BASE_URL,
       hasToken: !!localStorage.getItem('authToken'),
       environment: process.env.NODE_ENV,
-      isConfigured: !!AUTH_API_BASE_URL
+      isConfigured: !!AUTH_API_BASE_URL && !!DASHBOARD_API_BASE_URL
     };
   }
 }
