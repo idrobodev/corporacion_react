@@ -337,13 +337,13 @@ class ApiService {
     console.log('🔐 Starting login request...');
     console.log('📧 Email:', email);
     console.log('🌐 Auth API URL:', AUTH_API_BASE_URL);
-    console.log('🔗 Full login URL:', AUTH_API_BASE_URL + '/auth/login');
+    console.log('🔗 Full login URL:', AUTH_API_BASE_URL + '/api/auth/login');
 
     const startTime = Date.now();
 
     try {
       console.log('📤 Sending login request...');
-      const response = await authClient.post('/auth/auth/login', { email, password });
+      const response = await authClient.post('/api/auth/login', { email, password });
       const responseTime = Date.now() - startTime;
       console.log('✅ Login request completed in', responseTime, 'ms');
       console.log('📊 Response status:', response.status);
@@ -410,7 +410,7 @@ class ApiService {
   // Cerrar sesión
   async logout() {
     try {
-      await authClient.post('/auth/auth/logout');
+      await authClient.post('/api/auth/logout');
 
       // Limpiar localStorage
       localStorage.removeItem('authToken');
@@ -430,7 +430,7 @@ class ApiService {
   // Restablecer contraseña
   async resetPassword(email) {
     try {
-      const response = await authClient.post('/auth/auth/reset-password', { email });
+      const response = await authClient.post('/api/auth/reset-password', { email });
       return { data: response.data, error: null };
     } catch (error) {
       console.error('Error en reset password:', error);
@@ -477,7 +477,7 @@ class ApiService {
   // Actualizar perfil de usuario
   async updateProfile(profileData) {
     try {
-      const response = await authClient.put('/auth/auth/profile', profileData);
+      const response = await authClient.put('/api/auth/profile', profileData);
 
       // Actualizar usuario en localStorage
       const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
@@ -500,7 +500,7 @@ class ApiService {
   async hasPermission(requiredRole) {
     try {
       // Consultar endpoint real en backend FastAPI
-      const response = await authClient.get('/auth/auth/permission', {
+      const response = await authClient.get('/api/auth/permission', {
         params: { role: requiredRole }
       });
 
@@ -621,7 +621,7 @@ class ApiService {
   // Obtener datos del dashboard
   async getDashboardData() {
     try {
-      const response = await authClient.get('/dashboard/dashboard/stats');
+      const response = await authClient.get('/api/dashboard/stats');
       return { data: response.data, error: null };
     } catch (error) {
       console.error('Error obteniendo datos del dashboard:', error);
