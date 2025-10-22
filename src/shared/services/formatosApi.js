@@ -58,7 +58,7 @@ class FormatosApiService {
    */
   async listFiles(path = "") {
     try {
-      const response = await formatosClient.get('/list', {
+      const response = await formatosClient.get('/api/list', {
         params: { path }
       });
       return response.data;
@@ -79,7 +79,7 @@ class FormatosApiService {
       const formData = new FormData();
       formData.append('file', file);
 
-      const response = await formatosClient.post('/upload', formData, {
+      const response = await formatosClient.post('/api/upload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -99,7 +99,7 @@ class FormatosApiService {
    */
   async downloadFile(fileId) {
     try {
-      const response = await formatosClient.get(`/download/${fileId}`, {
+      const response = await formatosClient.get(`/api/download/${fileId}`, {
         responseType: 'blob',
       });
       return response.data;
@@ -116,7 +116,7 @@ class FormatosApiService {
    */
   async deleteFile(fileId) {
     try {
-      const response = await formatosClient.delete(`/${fileId}`);
+      const response = await formatosClient.delete(`/api/${fileId}`);
       return response.data;
     } catch (error) {
       console.error('Error eliminando archivo:', error);
@@ -134,7 +134,7 @@ class FormatosApiService {
    */
   async createFolder(nombre, parentPath = "") {
     try {
-      const response = await formatosClient.post('/folders/create', {
+      const response = await formatosClient.post('/api/folders/create', {
         nombre,
         parentPath
       });
@@ -154,7 +154,7 @@ class FormatosApiService {
    */
   async renameFolder(oldName, newName, parentPath = "") {
     try {
-      const response = await formatosClient.put('/folders/rename', {
+      const response = await formatosClient.put('/api/folders/rename', {
         oldName,
         newName,
         parentPath
@@ -173,7 +173,7 @@ class FormatosApiService {
    */
   async deleteFolder(folderId) {
     try {
-      const response = await formatosClient.delete(`/folders/${folderId}`);
+      const response = await formatosClient.delete(`/api/folders/${folderId}`);
       return response.data;
     } catch (error) {
       console.error('Error eliminando carpeta:', error);
