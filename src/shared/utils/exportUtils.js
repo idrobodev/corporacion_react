@@ -179,7 +179,14 @@ export const createEnhancedCSV = (options) => {
   sections.push(''); // Línea en blanco
 
   // Crear encabezados de columnas
-  const headerRow = headers.map(h => `"${h.label}"`).join(',');
+  const headerRow = headers.map(h => {
+    const label = h.label;
+    // Escapar comillas dobles y envolver en comillas si contiene comas, comillas o saltos de línea
+    if (label.includes(',') || label.includes('"') || label.includes('\n')) {
+      return `"${label.replace(/"/g, '""')}"`;
+    }
+    return label;
+  }).join(',');
   sections.push(headerRow);
 
   // Crear filas de datos
