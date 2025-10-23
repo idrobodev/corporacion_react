@@ -327,35 +327,6 @@ const Participantes = React.memo(() => {
       estado: normalizeStatus(participante.estado)
     }));
 
-    // Generar estadísticas
-    const activosCount = filteredParticipantes.filter(p => {
-      const upper = String(p.estado || '').toUpperCase();
-      return upper === 'ACTIVO';
-    }).length;
-
-    const inactivosCount = filteredParticipantes.filter(p => {
-      const upper = String(p.estado || '').toUpperCase();
-      return upper === 'INACTIVO';
-    }).length;
-
-    const masculinoCount = filteredParticipantes.filter(p => p.genero === 'MASCULINO').length;
-    const femeninoCount = filteredParticipantes.filter(p => p.genero === 'FEMENINO').length;
-
-    const statistics = {
-      'Total de Participantes': filteredParticipantes.length,
-      'Participantes Activos': `${activosCount} (${((activosCount / filteredParticipantes.length) * 100).toFixed(1)}%)`,
-      'Participantes Inactivos': `${inactivosCount} (${((inactivosCount / filteredParticipantes.length) * 100).toFixed(1)}%)`,
-      'Género Masculino': `${masculinoCount} (${((masculinoCount / filteredParticipantes.length) * 100).toFixed(1)}%)`,
-      'Género Femenino': `${femeninoCount} (${((femeninoCount / filteredParticipantes.length) * 100).toFixed(1)}%)`
-    };
-
-    // Preparar filtros aplicados
-    const appliedFilters = {
-      sede: filtros.sede !== 'Todas' ? filtros.sede : null,
-      género: filtros.genero !== 'Todos' ? filtros.genero : null,
-      estado: filtros.estado !== 'Todos' ? filtros.estado : null,
-      búsqueda: filtros.busqueda || null
-    };
 
     const csvContent = arrayToCSV(csvData, headers);
 

@@ -494,69 +494,6 @@ const Finance = React.memo(() => {
       observaciones: m.observaciones || 'N/A'
     }));
 
-    // Calcular estadísticas
-    const pagadasCount = filteredMensualidades.filter(m =>
-      (m.estado || m.status) === 'PAGADO'
-    ).length;
-
-    const pendientesCount = filteredMensualidades.filter(m =>
-      (m.estado || m.status) === 'PENDIENTE'
-    ).length;
-
-    const totalMonto = filteredMensualidades.reduce((sum, m) =>
-      sum + (parseFloat(m.valor || m.monto || 0)), 0
-    );
-
-    const montosPagados = filteredMensualidades
-      .filter(m => (m.estado || m.status) === 'PAGADO')
-      .reduce((sum, m) => sum + (parseFloat(m.valor || m.monto || 0)), 0);
-
-    const montosPendientes = filteredMensualidades
-      .filter(m => (m.estado || m.status) === 'PENDIENTE')
-      .reduce((sum, m) => sum + (parseFloat(m.valor || m.monto || 0)), 0);
-
-    // Contar métodos de pago
-    const transferenciaCount = filteredMensualidades.filter(m =>
-      m.metodo_pago === 'TRANSFERENCIA'
-    ).length;
-
-    const efectivoCount = filteredMensualidades.filter(m =>
-      m.metodo_pago === 'EFECTIVO'
-    ).length;
-
-    const statistics = {
-      'Total de Mensualidades': filteredMensualidades.length,
-      'Mensualidades Pagadas': `${pagadasCount} (${((pagadasCount / filteredMensualidades.length) * 100).toFixed(1)}%)`,
-      'Mensualidades Pendientes': `${pendientesCount} (${((pendientesCount / filteredMensualidades.length) * 100).toFixed(1)}%)`,
-      'Monto Total': formatCurrencyForCSV(totalMonto),
-      'Monto Pagado': formatCurrencyForCSV(montosPagados),
-      'Monto Pendiente': formatCurrencyForCSV(montosPendientes),
-      'Pagos por Transferencia': `${transferenciaCount} (${((transferenciaCount / filteredMensualidades.length) * 100).toFixed(1)}%)`,
-      'Pagos en Efectivo': `${efectivoCount} (${((efectivoCount / filteredMensualidades.length) * 100).toFixed(1)}%)`
-    };
-
-    // Preparar filtros aplicados
-    const appliedFilters = {};
-
-    if (filters.periodo !== 'all') {
-      const [mes, año] = filters.periodo.split('-');
-      appliedFilters.período = `${getMonthLabel(parseInt(mes))} ${año}`;
-    }
-
-    if (filters.sede !== 'all') {
-      const sede = sedes.find(s => s.id.toString() === filters.sede);
-      appliedFilters.sede = sede?.nombre || filters.sede;
-    }
-
-    if (filters.estado !== 'all') {
-      appliedFilters.estado = filters.estado === 'PAGADO' ? 'Pagada' :
-                              filters.estado === 'PENDIENTE' ? 'Pendiente' :
-                              filters.estado;
-    }
-
-    if (filters.busqueda) {
-      appliedFilters.búsqueda = filters.busqueda;
-    }
 
     const csvContent = arrayToCSV(csvData, headers);
 

@@ -307,44 +307,6 @@ const AcudientesComponent = () => {
       };
     });
 
-    // Contar parentescos
-    const parentescoCounts = {};
-    filteredAcudientes.forEach(acudiente => {
-      const parentesco = acudiente.parentesco || 'Sin especificar';
-      parentescoCounts[parentesco] = (parentescoCounts[parentesco] || 0) + 1;
-    });
-
-    // Generar estadísticas
-    const statistics = {
-      'Total de Acudientes': filteredAcudientes.length,
-      'Acudientes con Email': filteredAcudientes.filter(a => a.email).length,
-      'Acudientes con Teléfono': filteredAcudientes.filter(a => a.telefono).length
-    };
-
-    // Agregar distribución de parentescos (top 5)
-    const topParentescos = Object.entries(parentescoCounts)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 5);
-
-    topParentescos.forEach(([parentesco, count]) => {
-      statistics[`Parentesco ${parentesco}`] = `${count} (${((count / filteredAcudientes.length) * 100).toFixed(1)}%)`;
-    });
-
-    // Preparar filtros aplicados
-    const appliedFilters = {};
-
-    if (filtros.participante !== 'Todos') {
-      const participante = participantes.find(p =>
-        (p.id_participante || p.id).toString() === filtros.participante
-      );
-      appliedFilters.participante = participante?.nombre ||
-        `${participante?.nombres || ''} ${participante?.apellidos || ''}`.trim() ||
-        'N/A';
-    }
-
-    if (filtros.busqueda) {
-      appliedFilters.búsqueda = filtros.busqueda;
-    }
 
     const csvContent = arrayToCSV(csvData, headers);
 
