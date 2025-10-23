@@ -728,13 +728,32 @@ class ApiService {
     console.log('🔄 API: Solicitando mensualidades desde:', DASHBOARD_API_BASE_URL + '/mensualidades');
     try {
       const response = await dashboardClient.get('/mensualidades');
+      console.log('✅ API: Respuesta mensualidades cruda:', response.data);
       console.log('✅ API: Respuesta mensualidades:', {
         status: response.status,
         dataLength: response.data?.length || 'N/A',
         dataType: Array.isArray(response.data) ? 'array' : typeof response.data,
-        firstItem: response.data?.[0] || 'No data'
+        firstItem: response.data?.[0] || 'No data',
+        hasDataProperty: !!response.data?.data,
+        dataPropertyType: typeof response.data?.data,
+        dataPropertyLength: response.data?.data?.length || 'N/A'
       });
-      return { data: response.data, error: null };
+
+      // 🔍 DEBUG: El backend está devolviendo un objeto, no un array
+      // Necesitamos extraer response.data.data si existe
+      let finalData = response.data;
+      if (response.data && typeof response.data === 'object' && !Array.isArray(response.data) && response.data.data) {
+        console.log('🔄 API: Extrayendo data.data del response');
+        finalData = response.data.data;
+      }
+
+      console.log('✅ API: Datos finales a retornar:', {
+        isArray: Array.isArray(finalData),
+        length: finalData?.length || 'N/A',
+        firstItem: finalData?.[0] || 'No data'
+      });
+
+      return { data: finalData, error: null };
     } catch (error) {
       console.error('❌ API: Error obteniendo mensualidades:', {
         message: error.message,
