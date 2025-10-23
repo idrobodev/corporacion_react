@@ -12,9 +12,17 @@ import {
   FormModal,
   FormInput,
   FormSelect,
-  FormTextarea
+  FormTextarea,
+  ExportDropdown
 } from "components/UI";
 import { validateMensualidadRelations } from "shared/utils/validationUtils";
+import {
+  arrayToCSV,
+  downloadCSV,
+  formatCurrencyForCSV,
+  formatDateForCSV,
+  normalizeStatus
+} from "shared/utils/exportUtils";
 
 // Custom component for combined month-year filter
 const MonthYearSelect = ({ value, onChange, label = "Período" }) => {
@@ -353,6 +361,137 @@ const Finance = React.memo(() => {
     }
   }, [formData, modalData, closeModal]);
 
+  const handleExportPDF = useCallback(() => {
+    const printWindow = window.open('', '_blank');
+    const currentDate = new Date().toLocaleDateString('es-ES');
+
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Lista de Mensualidades - ${currentDate}</title>
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              margin: 20px;
+              color: #333;
+            }
+            .header {
+              text-align: center;
+              margin-bottom: 30px;
+              border-bottom: 2px solid #333;
+              padding-bottom: 20px;
+            }
+            .header h1 {
+              color: #2563eb;
+              margin: 0;
+              font-size: 24px;
+            }
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              margin-top: 20px;
+            }
+            th, td {
+              border: 1px solid #ddd;
+              padding: 8px 12px;
+              text-align: left;
+            }
+            th {
+              background-color: #f8f9fa;
+              font-weight: bold;
+              color: #495057;
+            }
+            tr:nth-child(even) {
+              background-color: #f9f9f9;
+            }
+            @media print {
+              body { margin: 0; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1>Lista de Mensualidades</h1>
+            <p>Corporación Todo por un Alma</p>
+            <p>Fecha de generación: ${currentDate}</p>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Participante</th>
+                <th>Acudiente</th>
+                <th>Mes</th>
+                <th>Año</th>
+                <th>Valor</th>
+                <th>Estado</th>
+                <th>Método de Pago</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${filteredMensualidades.map(m => `
+                <tr>
+                  <td>${m.participant_name || 'N/A'}</td>
+                  <td>${m.acudiente_name || 'N/A'}</td>
+                  <td>${getMonthLabel(m.mes)}</td>
+                  <td>${m.año || 'N/A'}</td>
+                  <td>$${(m.valor || m.monto || 0).toLocaleString()}</td>
+                  <td>${normalizeStatus(m.estado || m.status)}</td>
+                  <td>${m.metodo_pago || 'N/A'}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+
+          <script>
+            window.onload = function() {
+              window.print();
+              setTimeout(function() {
+                window.close();
+              }, 1000);
+            }
+          </script>
+        </body>
+      </html>
+    `;
+
+    printWindow.document.write(htmlContent);
+    printWindow.document.close();
+  }, [filteredMensualidades, getMonthLabel]);
+
+  const handleExportCSV = useCallback(() => {
+    const headers = [
+      { key: 'id', label: 'ID' },
+      { key: 'participant_name', label: 'Participante' },
+      { key: 'acudiente_name', label: 'Acudiente' },
+      { key: 'mes', label: 'Mes' },
+      { key: 'año', label: 'Año' },
+      { key: 'valor', label: 'Valor' },
+      { key: 'estado', label: 'Estado' },
+      { key: 'metodo_pago', label: 'Método de Pago' },
+      { key: 'fecha_pago', label: 'Fecha Pago' },
+      { key: 'observaciones', label: 'Observaciones' }
+    ];
+
+    const csvData = filteredMensualidades.map(m => ({
+      id: m.id || '',
+      participant_name: m.participant_name || '',
+      acudiente_name: m.acudiente_name || '',
+      mes: getMonthLabel(m.mes),
+      año: m.año || '',
+      valor: formatCurrencyForCSV(m.valor || m.monto || 0),
+      estado: normalizeStatus(m.estado || m.status),
+      metodo_pago: m.metodo_pago || '',
+      fecha_pago: formatDateForCSV(m.fecha_pago),
+      observaciones: m.observaciones || ''
+    }));
+
+    const csvContent = arrayToCSV(csvData, headers);
+    const filename = `mensualidades_${new Date().toISOString().split('T')[0]}.csv`;
+    downloadCSV(csvContent, filename);
+  }, [filteredMensualidades, getMonthLabel]);
+
   if (loading) {
     return (
       <DashboardLayout
@@ -386,9 +525,15 @@ const Finance = React.memo(() => {
       title="Mensualidades"
       subtitle="Pagadas, pendientes y vencidas"
       extraActions={
-        <button onClick={() => openModal()} className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-          <i className="fas fa-plus mr-2"></i>Nueva Mensualidad
-        </button>
+        <div className="flex space-x-3">
+          <ExportDropdown
+            onExportPDF={handleExportPDF}
+            onExportCSV={handleExportCSV}
+          />
+          <button onClick={() => openModal()} className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+            <i className="fas fa-plus mr-2"></i>Nueva Mensualidad
+          </button>
+        </div>
       }
     >
       <section className="px-4 md:px-6 py-4 md:py-6">
