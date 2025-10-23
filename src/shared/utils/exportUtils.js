@@ -88,20 +88,23 @@ export const arrayToCSV = (data, headers) => {
     return '';
   }
 
+  // Use semicolon as delimiter for Spanish/Latin American Excel compatibility
+  const delimiter = ';';
+
   // Create header row
-  const headerRow = headers.map(header => `"${header.label}"`).join(',');
+  const headerRow = headers.map(header => `"${header.label}"`).join(delimiter);
 
   // Create data rows
   const dataRows = data.map(row => {
     return headers.map(header => {
       const value = getNestedValue(row, header.key);
-      // Escape quotes and wrap in quotes if contains comma, quote, or newline
+      // Escape quotes and wrap in quotes if contains delimiter, quote, or newline
       const stringValue = String(value || '');
-      if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
+      if (stringValue.includes(delimiter) || stringValue.includes('"') || stringValue.includes('\n')) {
         return `"${stringValue.replace(/"/g, '""')}"`;
       }
       return stringValue;
-    }).join(',');
+    }).join(delimiter);
   });
 
   return [headerRow, ...dataRows].join('\n');
@@ -178,15 +181,18 @@ export const createEnhancedCSV = (options) => {
   sections.push(`"DATOS DEL REPORTE"`);
   sections.push(''); // Línea en blanco
 
+  // Use semicolon as delimiter for Spanish/Latin American Excel compatibility
+  const delimiter = ';';
+
   // Crear encabezados de columnas
   const headerRow = headers.map(h => {
     const label = h.label;
-    // Escapar comillas dobles y envolver en comillas si contiene comas, comillas o saltos de línea
-    if (label.includes(',') || label.includes('"') || label.includes('\n')) {
+    // Escapar comillas dobles y envolver en comillas si contiene delimitador, comillas o saltos de línea
+    if (label.includes(delimiter) || label.includes('"') || label.includes('\n')) {
       return `"${label.replace(/"/g, '""')}"`;
     }
     return label;
-  }).join(',');
+  }).join(delimiter);
   sections.push(headerRow);
 
   // Crear filas de datos
@@ -197,12 +203,12 @@ export const createEnhancedCSV = (options) => {
       const dataRow = headers.map(header => {
         const value = getNestedValue(row, header.key);
         const stringValue = String(value || '');
-        // Escapar comillas dobles y envolver en comillas si contiene comas, comillas o saltos de línea
-        if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
+        // Escapar comillas dobles y envolver en comillas si contiene delimitador, comillas o saltos de línea
+        if (stringValue.includes(delimiter) || stringValue.includes('"') || stringValue.includes('\n')) {
           return `"${stringValue.replace(/"/g, '""')}"`;
         }
-        return stringValue; // No envolver en comillas si no es necesario
-      }).join(',');
+        return stringValue;
+      }).join(delimiter);
       sections.push(dataRow);
     });
   }
