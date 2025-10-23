@@ -76,13 +76,13 @@ const Finance = React.memo(() => {
   const [filteredAcudientes, setFilteredAcudientes] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [formData, setFormData] = useState({ 
-    participant_id: '', 
+  const [formData, setFormData] = useState({
+    participant_id: '',
     id_acudiente: '',
-    mes: '', 
-    año: new Date().getFullYear(), 
-    valor: '', 
-    status: 'PAGADA',
+    mes: '',
+    año: new Date().getFullYear(),
+    valor: '',
+    status: 'PAGADO',
     metodo_pago: 'TRANSFERENCIA',
     fecha_pago: '',
     observaciones: ''
@@ -238,13 +238,13 @@ const Finance = React.memo(() => {
       });
       updateModalData(mensualidad);
     } else {
-      setFormData({ 
-        participant_id: '', 
+      setFormData({
+        participant_id: '',
         id_acudiente: '',
-        mes: '', 
-        año: new Date().getFullYear(), 
-        valor: '', 
-        status: 'PAGADA',
+        mes: '',
+        año: new Date().getFullYear(),
+        valor: '',
+        status: 'PAGADO',
         metodo_pago: 'TRANSFERENCIA',
         fecha_pago: '',
         observaciones: ''
@@ -269,9 +269,9 @@ const Finance = React.memo(() => {
   const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
     
-    // Validate fecha_pago is required when status is PAGADA
-    if (formData.status === 'PAGADA' && !formData.fecha_pago) {
-      alert('La fecha de pago es requerida cuando el estado es PAGADA');
+    // Validate fecha_pago is required when status is PAGADO
+    if (formData.status === 'PAGADO' && !formData.fecha_pago) {
+      alert('La fecha de pago es requerida cuando el estado es PAGADO');
       return;
     }
     
@@ -302,7 +302,7 @@ const Finance = React.memo(() => {
       monto: parseFloat(formData.valor),
       estado: formData.status,
       metodo_pago: formData.metodo_pago,
-      fecha_pago: formData.status === 'PAGADA' ? formData.fecha_pago : null,
+      fecha_pago: formData.status === 'PAGADO' ? formData.fecha_pago : null,
       observaciones: formData.observaciones || null
     };
     
@@ -385,7 +385,7 @@ const Finance = React.memo(() => {
                   placeholder: 'Todos',
                   options: [
                     { value: 'all', label: 'Todos' },
-                    { value: 'PAGADA', label: 'Pagada' },
+                    { value: 'PAGADO', label: 'Pagada' },
                     { value: 'PENDIENTE', label: 'Pendiente' }
                   ]
                 },
@@ -446,7 +446,7 @@ const Finance = React.memo(() => {
                       <StatusToggle
                         currentStatus={row.status || row.estado}
                         statuses={[
-                          { value: 'PAGADA', label: 'PAGADA', variant: 'success' },
+                          { value: 'PAGADO', label: 'PAGADO', variant: 'success' },
                           { value: 'PENDIENTE', label: 'PENDIENTE', variant: 'danger' }
                         ]}
                         onChange={(newStatus) => toggleStatus(row.id, newStatus)}
@@ -589,7 +589,7 @@ const Finance = React.memo(() => {
                   value={formData.status}
                   onChange={(value) => handleFormDataChange('status', value)}
                   options={[
-                    { value: 'PAGADA', label: 'Pagada' },
+                    { value: 'PAGADO', label: 'Pagada' },
                     { value: 'PENDIENTE', label: 'Pendiente' }
                   ]}
                   required
@@ -608,14 +608,14 @@ const Finance = React.memo(() => {
                 />
               </div>
               
-              {formData.status === 'PAGADA' && (
+              {formData.status === 'PAGADO' && (
                 <FormInput
                   label="Fecha de Pago"
                   name="fecha_pago"
                   type="date"
                   value={formData.fecha_pago}
                   onChange={(value) => handleFormDataChange('fecha_pago', value)}
-                  required={formData.status === 'PAGADA'}
+                  required={formData.status === 'PAGADO'}
                 />
               )}
               

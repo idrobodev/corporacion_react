@@ -324,7 +324,7 @@ const AcudientesComponent = () => {
         </div>
       }
     >
-      <section className="px-6 py-6">
+      <section className="px-4 md:px-6 py-4 md:py-6">
         <FilterBar
           filters={filterConfig}
           values={filtros}
@@ -367,13 +367,24 @@ const AcudientesComponent = () => {
                       <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mr-3">
                         <i className="fas fa-user-friends text-purple-600"></i>
                       </div>
-                      <div>
-                        <p className="font-medium text-gray-900">
+                      <div className="min-w-0 flex-1">
+                        <p className="font-medium text-gray-900 truncate">
                           {`${acudiente.nombres || ''} ${acudiente.apellidos || ''}`.trim() || 'Sin nombre'}
                         </p>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-gray-500 truncate">
                           {acudiente.tipo_documento || 'CC'}: {acudiente.numero_documento || 'N/A'}
                         </p>
+                        {/* Mobile-only contact info */}
+                        <div className="md:hidden mt-1 space-y-1">
+                          <p className="text-xs text-gray-600 flex items-center">
+                            <i className="fas fa-phone text-gray-400 mr-1 text-xs"></i>
+                            {acudiente.telefono || 'N/A'}
+                          </p>
+                          <p className="text-xs text-gray-600 flex items-center">
+                            <i className="fas fa-envelope text-gray-400 mr-1 text-xs"></i>
+                            {acudiente.email || 'N/A'}
+                          </p>
+                        </div>
                       </div>
                     </div>
                   )
@@ -387,11 +398,11 @@ const AcudientesComponent = () => {
                       (p.id_participante || p.id) === acudiente.id_participante
                     );
                     return (
-                      <div>
-                        <p className="text-gray-900">
+                      <div className="min-w-0">
+                        <p className="text-gray-900 truncate">
                           {participante?.nombre || `${participante?.nombres || ''} ${participante?.apellidos || ''}`.trim() || 'N/A'}
                         </p>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-gray-500 truncate">
                           {acudiente.parentesco || 'Sin parentesco'}
                         </p>
                       </div>
@@ -401,15 +412,16 @@ const AcudientesComponent = () => {
                 {
                   key: 'contacto',
                   header: 'Contacto',
+                  hideInMobile: true,
                   render: (acudiente) => (
-                    <div>
-                      <p className="text-gray-900">
+                    <div className="min-w-0">
+                      <p className="text-gray-900 flex items-center">
                         <i className="fas fa-phone text-gray-400 mr-2"></i>
-                        {acudiente.telefono || 'N/A'}
+                        <span className="truncate">{acudiente.telefono || 'N/A'}</span>
                       </p>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-gray-500 flex items-center mt-1">
                         <i className="fas fa-envelope text-gray-400 mr-2"></i>
-                        {acudiente.email || 'N/A'}
+                        <span className="truncate">{acudiente.email || 'N/A'}</span>
                       </p>
                     </div>
                   )

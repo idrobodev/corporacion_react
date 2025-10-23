@@ -69,17 +69,17 @@ const MobileCardView = ({
 
   // Mobile card view
   return (
-    <div className={`space-y-4 ${className}`}>
+    <div className={`space-y-4 px-0 overflow-hidden ${className}`}>
       {data.map((row) => (
         <div
           key={keyExtractor(row)}
           className={`
-            bg-white rounded-lg shadow-sm border border-gray-200 p-4
+            bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-4 overflow-hidden
             ${onRowClick ? 'cursor-pointer hover:shadow-md hover:border-blue-300 transition-all duration-200' : ''}
           `}
           onClick={() => onRowClick && onRowClick(row)}
         >
-          <div className="space-y-3">
+          <div className="space-y-2 sm:space-y-3 overflow-hidden">
             {columns.map((column, index) => {
               // Skip columns that are explicitly marked as hidden in mobile
               if (column.hideInMobile) {
@@ -93,18 +93,26 @@ const MobileCardView = ({
                 return null;
               }
 
+              // Check if this is an action column
+              const isActionColumn = column.key === 'acciones' || column.header === 'Acciones';
+
               return (
-                <div 
-                  key={index} 
+                <div
+                  key={index}
                   className={`
-                    flex justify-between items-start gap-4
-                    ${index !== columns.length - 1 ? 'pb-3 border-b border-gray-100' : ''}
+                    ${isActionColumn
+                      ? 'flex flex-col gap-2 pt-2 border-t border-gray-100 overflow-hidden'
+                      : 'flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 sm:gap-4 pb-2 sm:pb-3 border-b border-gray-100 overflow-hidden'
+                    }
                   `}
                 >
-                  <span className="text-sm font-medium text-gray-600 flex-shrink-0 min-w-[100px]">
+                  <span className="text-xs sm:text-sm font-medium text-gray-600 flex-shrink-0 truncate">
                     {column.header}
                   </span>
-                  <div className="text-sm text-gray-900 text-right flex-1 break-words">
+                  <div className={`
+                    text-xs sm:text-sm text-gray-900 break-words overflow-hidden
+                    ${isActionColumn ? 'w-full flex justify-end' : 'sm:text-right sm:flex-1 min-w-0'}
+                  `}>
                     {cellContent}
                   </div>
                 </div>

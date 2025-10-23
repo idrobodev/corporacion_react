@@ -245,15 +245,28 @@ const UsuariosComponent = () => {
               columns={[
                 {
                   key: 'email',
-                  header: 'Email',
+                  header: 'Usuario',
                   render: (usuario) => (
                     <div className="flex items-center">
                       <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
                         <i className="fas fa-user text-blue-600"></i>
                       </div>
-                      <div>
-                        <p className="font-medium text-gray-900">{usuario.email}</p>
-                        <p className="text-sm text-gray-500">ID: {usuario.id_usuario || usuario.id}</p>
+                      <div className="min-w-0 flex-1">
+                        <p className="font-medium text-gray-900 truncate">{usuario.email}</p>
+                        <p className="text-sm text-gray-500 truncate">ID: {usuario.id_usuario || usuario.id}</p>
+                        {/* Mobile-only role info */}
+                        <div className="md:hidden mt-1">
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                            (usuario.rol || usuario.role) === ROLES.ADMINISTRADOR || (usuario.rol || usuario.role) === 'ADMINISTRADOR'
+                              ? 'bg-purple-100 text-purple-800'
+                              : 'bg-green-100 text-green-800'
+                          }`}>
+                            <i className={`fas ${
+                              (usuario.rol || usuario.role) === ROLES.ADMINISTRADOR || (usuario.rol || usuario.role) === 'ADMINISTRADOR' ? 'fa-user-shield' : 'fa-user'
+                            } mr-1`}></i>
+                            {(usuario.rol || usuario.role) === ROLES.ADMINISTRADOR || (usuario.rol || usuario.role) === 'ADMINISTRADOR' ? 'Admin' : 'Consulta'}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   )
@@ -261,6 +274,7 @@ const UsuariosComponent = () => {
                 {
                   key: 'rol',
                   header: 'Rol',
+                  hideInMobile: true,
                   render: (usuario) => {
                     const userRole = usuario.rol || usuario.role;
                     return (
@@ -288,56 +302,54 @@ const UsuariosComponent = () => {
                       const userRole = usuario.rol || usuario.role;
                       const isAdmin = userRole === ROLES.ADMINISTRADOR || userRole === 'ADMINISTRADOR';
 
+                      if (isAdmin) {
+                        return (
+                          <span className="text-xs text-gray-500 font-medium px-2 py-1 bg-gray-100 rounded whitespace-nowrap">
+                            <i className="fas fa-shield-alt mr-1"></i>
+                            Protegido
+                          </span>
+                        );
+                      }
+
                       return (
-                        <div className="flex items-center space-x-2">
-                          {!isAdmin && (
-                            <button
-                              onClick={() => {
+                        <ActionDropdown
+                          actions={[
+                            {
+                              label: 'Editar',
+                              icon: 'fas fa-edit',
+                              onClick: () => {
                                 console.log('✏️ Editar usuario:', usuario.email);
                                 editarModal.openModal('edit', usuario);
-                              }}
-                              className="text-blue-600 hover:text-blue-800 p-2 rounded-lg hover:bg-blue-50 transition-colors"
-                              title="Editar usuario"
-                            >
-                              <i className="fas fa-edit"></i>
-                            </button>
-                          )}
-                          {!isAdmin && (
-                            <button
-                              onClick={() => {
+                              }
+                            },
+                            {
+                              label: 'Eliminar',
+                              icon: 'fas fa-trash',
+                              variant: 'danger',
+                              onClick: () => {
                                 console.log('🗑️ Eliminar usuario:', usuario.email);
                                 if (window.confirm('¿Estás seguro de que quieres eliminar este usuario?')) {
                                   window.deleteUser && window.deleteUser(usuario.id_usuario || usuario.id);
                                 }
-                              }}
-                              className="text-red-600 hover:text-red-800 p-2 rounded-lg hover:bg-red-50 transition-colors"
-                              title="Eliminar usuario"
-                            >
-                              <i className="fas fa-trash"></i>
-                            </button>
-                          )}
-                          {isAdmin && (
-                            <span className="text-xs text-gray-500 font-medium px-2 py-1 bg-gray-100 rounded">
-                              <i className="fas fa-shield-alt mr-1"></i>
-                              Protegido
-                            </span>
-                          )}
-                        </div>
+                              }
+                            }
+                          ]}
+                        />
                       );
                     } else {
                       return (
-                        <div className="flex items-center space-x-2">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
                           <button
                             onClick={() => {
                               console.log('👁️ Abriendo modal de solo lectura para:', usuario.email);
                               verModal.openModal('view', usuario);
                             }}
-                            className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                            className="text-blue-600 hover:text-blue-800 text-xs sm:text-sm font-medium whitespace-nowrap flex items-center"
                           >
                             <i className="fas fa-eye mr-1"></i>
-                            Ver Detalles
+                            Ver
                           </button>
-                          <span className="text-xs text-yellow-600 font-medium">
+                          <span className="text-xs text-yellow-600 font-medium whitespace-nowrap flex items-center">
                             <i className="fas fa-lock mr-1"></i>
                             Solo Lectura
                           </span>
