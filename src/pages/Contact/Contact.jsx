@@ -74,7 +74,7 @@ const Contact = () => {
     {
       name: "TikTok",
       icon: "🎵",
-      url: "#",
+      url: "https://www.tiktok.com/@corporaciontodoporunalma",
       color: "from-black to-gray-800",
       hoverColor: "hover:from-gray-800 hover:to-black",
     },
