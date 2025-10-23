@@ -17,7 +17,7 @@ import {
 } from "components/UI";
 import { validateMensualidadRelations } from "shared/utils/validationUtils";
 import {
-  createEnhancedCSV,
+  arrayToCSV,
   downloadCSV,
   formatCurrencyForCSV,
   formatDateForCSV,
@@ -558,16 +558,7 @@ const Finance = React.memo(() => {
       appliedFilters.búsqueda = filters.busqueda;
     }
 
-    const csvContent = createEnhancedCSV({
-      title: 'Reporte de Mensualidades',
-      data: csvData,
-      headers,
-      metadata: {
-        generatedBy: 'Sistema de Gestión Financiera'
-      },
-      statistics,
-      filters: appliedFilters
-    });
+    const csvContent = arrayToCSV(csvData, headers);
 
     const filename = `mensualidades_${new Date().toISOString().split('T')[0]}.csv`;
     downloadCSV(csvContent, filename);

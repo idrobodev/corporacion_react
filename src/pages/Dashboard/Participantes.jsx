@@ -11,7 +11,7 @@ import {
   validateSedeExists
 } from "shared/utils/validationUtils";
 import {
-  createEnhancedCSV,
+  arrayToCSV,
   downloadCSV,
   calculateAge,
   formatDateForCSV,
@@ -357,16 +357,7 @@ const Participantes = React.memo(() => {
       búsqueda: filtros.busqueda || null
     };
 
-    const csvContent = createEnhancedCSV({
-      title: 'Reporte de Participantes',
-      data: csvData,
-      headers,
-      metadata: {
-        generatedBy: 'Sistema de Gestión'
-      },
-      statistics,
-      filters: appliedFilters
-    });
+    const csvContent = arrayToCSV(csvData, headers);
 
     const filename = `participantes_${new Date().toISOString().split('T')[0]}.csv`;
     downloadCSV(csvContent, filename);

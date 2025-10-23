@@ -12,7 +12,7 @@ import {
   validateParticipanteExists
 } from "shared/utils/validationUtils";
 import {
-  createEnhancedCSV,
+  arrayToCSV,
   downloadCSV,
   formatParticipantName,
   formatDocument
@@ -346,16 +346,7 @@ const AcudientesComponent = () => {
       appliedFilters.búsqueda = filtros.busqueda;
     }
 
-    const csvContent = createEnhancedCSV({
-      title: 'Reporte de Acudientes',
-      data: csvData,
-      headers,
-      metadata: {
-        generatedBy: 'Sistema de Gestión'
-      },
-      statistics,
-      filters: appliedFilters
-    });
+    const csvContent = arrayToCSV(csvData, headers);
 
     const filename = `acudientes_${new Date().toISOString().split('T')[0]}.csv`;
     downloadCSV(csvContent, filename);
