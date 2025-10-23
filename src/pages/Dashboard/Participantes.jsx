@@ -332,7 +332,7 @@ const Participantes = React.memo(() => {
       const upper = String(p.estado || '').toUpperCase();
       return upper === 'ACTIVO';
     }).length;
-    
+
     const inactivosCount = filteredParticipantes.filter(p => {
       const upper = String(p.estado || '').toUpperCase();
       return upper === 'INACTIVO';

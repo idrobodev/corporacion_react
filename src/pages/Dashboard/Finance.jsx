@@ -498,7 +498,7 @@ const Finance = React.memo(() => {
     const pagadasCount = filteredMensualidades.filter(m =>
       (m.estado || m.status) === 'PAGADO'
     ).length;
-    
+
     const pendientesCount = filteredMensualidades.filter(m =>
       (m.estado || m.status) === 'PENDIENTE'
     ).length;
@@ -519,7 +519,7 @@ const Finance = React.memo(() => {
     const transferenciaCount = filteredMensualidades.filter(m =>
       m.metodo_pago === 'TRANSFERENCIA'
     ).length;
-    
+
     const efectivoCount = filteredMensualidades.filter(m =>
       m.metodo_pago === 'EFECTIVO'
     ).length;
@@ -537,23 +537,23 @@ const Finance = React.memo(() => {
 
     // Preparar filtros aplicados
     const appliedFilters = {};
-    
+
     if (filters.periodo !== 'all') {
       const [mes, año] = filters.periodo.split('-');
       appliedFilters.período = `${getMonthLabel(parseInt(mes))} ${año}`;
     }
-    
+
     if (filters.sede !== 'all') {
       const sede = sedes.find(s => s.id.toString() === filters.sede);
       appliedFilters.sede = sede?.nombre || filters.sede;
     }
-    
+
     if (filters.estado !== 'all') {
       appliedFilters.estado = filters.estado === 'PAGADO' ? 'Pagada' :
                               filters.estado === 'PENDIENTE' ? 'Pendiente' :
                               filters.estado;
     }
-    
+
     if (filters.busqueda) {
       appliedFilters.búsqueda = filters.busqueda;
     }
