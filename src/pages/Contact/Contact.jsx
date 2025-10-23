@@ -53,7 +53,7 @@ const Contact = () => {
     {
       name: "Instagram",
       icon: "📷",
-      url: "#",
+      url: "https://www.instagram.com/corporaciontodoporunalma/",
       color: "from-pink-500 to-purple-600",
       hoverColor: "hover:from-pink-600 hover:to-purple-700",
     },
