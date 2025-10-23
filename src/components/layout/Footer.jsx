@@ -94,7 +94,7 @@ const Footer = () => {
             </p>
             <p className="py-2 flex items-center">
               <i className="far fa-envelope mr-3"></i> 
-              <span>info@todoporalma.org</span>
+              <span>trabajosocial@todoporunalma.org</span>
             </p>
             <p className="flex items-center">
               <i className="fas fa-map-marker-alt mr-3"></i> 
