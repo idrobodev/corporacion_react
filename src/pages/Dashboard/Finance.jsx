@@ -132,22 +132,34 @@ const Finance = React.memo(() => {
         setLoading(true);
         setError(null);
         console.log('🔄 Cargando datos financieros...');
-        
+
         const [mensRes, partsRes, sedesRes, acudRes] = await Promise.all([
           dbService.getMensualidades(),
           dbService.getParticipantes(),
           dbService.getSedes(),
           dbService.getAcudientes()
         ]);
-        
-        console.log('📊 Resultados:', { mensRes, partsRes, sedesRes, acudRes });
-        
+
+        console.log('📊 Resultados crudos:', {
+          mensRes: { data: mensRes.data, error: mensRes.error },
+          partsRes: { data: partsRes.data, error: partsRes.error },
+          sedesRes: { data: sedesRes.data, error: sedesRes.error },
+          acudRes: { data: acudRes.data, error: acudRes.error }
+        });
+
         // Asegurar que siempre sean arrays (API service ya extrae el nested data)
         const mensualidadesData = Array.isArray(mensRes.data) ? mensRes.data : [];
         const participantesData = Array.isArray(partsRes.data) ? partsRes.data : [];
         const sedesData = Array.isArray(sedesRes.data) ? sedesRes.data : [];
         const acudientesData = Array.isArray(acudRes.data) ? acudRes.data : [];
-        
+
+        console.log('🔍 Estructura de mensualidadesData:', {
+          isArray: Array.isArray(mensualidadesData),
+          length: mensualidadesData.length,
+          firstItem: mensualidadesData[0] || 'No hay elementos',
+          rawResponse: mensRes
+        });
+
         setMensualidades(mensualidadesData);
         setParticipants(participantesData);
         setSedes(sedesData);
@@ -195,22 +207,42 @@ const Finance = React.memo(() => {
     const safeMensualidades = Array.isArray(mensualidades) ? mensualidades : [];
     let filtered = safeMensualidades;
 
+    console.log('🔍 Aplicando filtros:', {
+      filtrosActivos: filters,
+      mensualidadesTotal: safeMensualidades.length,
+      mensualidadesMuestra: safeMensualidades.slice(0, 3) // Primeros 3 elementos para debug
+    });
+
     if (filters.periodo !== 'all') {
       const [mes, año] = filters.periodo.split('-').map(Number);
+      console.log('📅 Filtrando por período:', { mes, año });
       filtered = filtered.filter(m => m.mes === mes && m.año === año);
+      console.log('📅 Después de filtro período:', filtered.length);
     }
     if (filters.sede !== 'all') {
+      console.log('🏢 Filtrando por sede:', filters.sede);
       filtered = filtered.filter(m => m.sede_id === parseInt(filters.sede));
+      console.log('🏢 Después de filtro sede:', filtered.length);
     }
     if (filters.estado !== 'all') {
+      console.log('📊 Filtrando por estado:', filters.estado);
       filtered = filtered.filter(m => m.estado === filters.estado);
+      console.log('📊 Después de filtro estado:', filtered.length);
     }
     if (filters.busqueda) {
+      console.log('🔍 Filtrando por búsqueda:', filters.busqueda);
       filtered = filtered.filter(m =>
         (m.participant_documento || '').includes(filters.busqueda) ||
         (m.acudiente_documento || '').includes(filters.busqueda)
       );
+      console.log('🔍 Después de filtro búsqueda:', filtered.length);
     }
+
+    console.log('✅ Resultado final del filtrado:', {
+      totalFiltrado: filtered.length,
+      filtrosAplicados: Object.keys(filters).filter(k => filters[k] !== 'all' && filters[k] !== '')
+    });
+
     return filtered;
   }, [mensualidades, filters]);
 
@@ -491,7 +523,18 @@ const Finance = React.memo(() => {
                 loading={loading}
                 emptyState={
                   <div className="text-center py-8 text-gray-500">
-                    No hay mensualidades que mostrar
+                    <div className="mb-4">
+                      <strong>No hay mensualidades que mostrar</strong>
+                    </div>
+                    <div className="text-sm text-gray-400 space-y-1">
+                      <div>📊 Total mensualidades en BD: {mensualidades.length}</div>
+                      <div>🔍 Después de filtros: {filteredMensualidades.length}</div>
+                      <div>⚙️ Filtros activos: {Object.keys(filters).filter(k => filters[k] !== 'all' && filters[k] !== '').length > 0 ?
+                        Object.keys(filters).filter(k => filters[k] !== 'all' && filters[k] !== '').join(', ') :
+                        'Ninguno'}</div>
+                      <div>🔧 Estado de carga: {loading ? 'Cargando...' : 'Completado'}</div>
+                      {error && <div className="text-red-400">❌ Error: {error}</div>}
+                    </div>
                   </div>
                 }
               />

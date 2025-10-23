@@ -29,6 +29,21 @@ const AUTH_API_BASE_URL = process.env.REACT_APP_AUTH_API_BASE_URL ||
 const DASHBOARD_API_BASE_URL = process.env.REACT_APP_DASHBOARD_API_BASE_URL ||
   `${API_BASE_DOMAIN}/api/dashboard`;
 
+console.log('🔧 PRODUCTION DEBUG - Environment variables:');
+console.log('  - NODE_ENV:', process.env.NODE_ENV);
+console.log('  - REACT_APP_AUTH_API_BASE_URL:', process.env.REACT_APP_AUTH_API_BASE_URL);
+console.log('  - REACT_APP_DASHBOARD_API_BASE_URL:', process.env.REACT_APP_DASHBOARD_API_BASE_URL);
+console.log('  - API_BASE_DOMAIN:', API_BASE_DOMAIN);
+console.log('  - AUTH_API_BASE_URL:', AUTH_API_BASE_URL);
+console.log('  - DASHBOARD_API_BASE_URL:', DASHBOARD_API_BASE_URL);
+
+// 🔍 DEBUG: Forzar URLs de producción correctas si estamos en producción
+if (process.env.NODE_ENV === 'production') {
+  console.log('🏭 PRODUCTION MODE DETECTED - Forzando URLs correctas');
+  // Las URLs ya están configuradas correctamente en .env.production
+  // pero vamos a verificar que se estén usando
+}
+
 console.log('🔧 AUTH_API_BASE_URL configurada como:', AUTH_API_BASE_URL);
 console.log('🔧 DASHBOARD_API_BASE_URL configurada como:', DASHBOARD_API_BASE_URL);
 console.log('🔧 Full login URL will be:', AUTH_API_BASE_URL + '/login');
@@ -710,11 +725,24 @@ class ApiService {
 
   // Obtener lista de mensualidades
   async getMensualidades() {
+    console.log('🔄 API: Solicitando mensualidades desde:', DASHBOARD_API_BASE_URL + '/mensualidades');
     try {
       const response = await dashboardClient.get('/mensualidades');
+      console.log('✅ API: Respuesta mensualidades:', {
+        status: response.status,
+        dataLength: response.data?.length || 'N/A',
+        dataType: Array.isArray(response.data) ? 'array' : typeof response.data,
+        firstItem: response.data?.[0] || 'No data'
+      });
       return { data: response.data, error: null };
     } catch (error) {
-      console.error('Error obteniendo mensualidades:', error);
+      console.error('❌ API: Error obteniendo mensualidades:', {
+        message: error.message,
+        status: error.response?.status,
+        url: error.config?.url,
+        baseURL: error.config?.baseURL,
+        fullURL: error.config?.baseURL + error.config?.url
+      });
       return {
         data: null,
         error: {
