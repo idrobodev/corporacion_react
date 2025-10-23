@@ -1,16 +1,23 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import DashboardLayout from "components/layout/DashboardLayout";
 import { dbService } from "shared/services";
-import { FilterBar } from "components/UI/Filter";
+import { FilterBar, ExportDropdown } from "components/UI/Filter";
 import { StatsGrid } from "components/UI/Card";
 import { DataTable, ActionDropdown } from "components/UI/Table";
 import { ViewDetailsModal, EditFormModal, CreateFormModal } from "components/common/CRUDModals";
 import { useFilters, useModal } from "shared/hooks";
-import { 
-  validateAcudienteDocumentoUnico, 
+import {
+  validateAcudienteDocumentoUnico,
   validateEmail,
-  validateParticipanteExists 
+  validateParticipanteExists
 } from "shared/utils/validationUtils";
+import {
+  arrayToCSV,
+  downloadCSV,
+  formatDateForCSV,
+  formatParticipantName,
+  formatDocument
+} from "shared/utils/exportUtils";
 
 const AcudientesComponent = () => {
   const [acudientes, setAcudientes] = useState([]);
@@ -225,11 +232,15 @@ const AcudientesComponent = () => {
                 const participante = participantes.find(p =>
                   (p.id_participante || p.id) === acudiente.id_participante
                 );
+                const acudienteNombre = `${acudiente.nombres || ''} ${acudiente.apellidos || ''}`.trim() || 'N/A';
+                const acudienteDoc = formatDocument(acudiente.tipo_documento, acudiente.numero_documento);
+                const participanteNombre = formatParticipantName(participante);
+                
                 return `
                   <tr>
-                    <td>${`${acudiente.nombres || ''} ${acudiente.apellidos || ''}`.trim() || 'N/A'}</td>
-                    <td>${acudiente.tipo_documento || 'CC'}: ${acudiente.numero_documento || 'N/A'}</td>
-                    <td>${participante?.nombre || `${participante?.nombres || ''} ${participante?.apellidos || ''}`.trim() || 'N/A'}</td>
+                    <td>${acudienteNombre}</td>
+                    <td>${acudienteDoc}</td>
+                    <td>${participanteNombre}</td>
                     <td>${acudiente.parentesco || 'N/A'}</td>
                     <td>${acudiente.telefono || 'N/A'}</td>
                     <td>${acudiente.email || 'N/A'}</td>
@@ -259,6 +270,48 @@ const AcudientesComponent = () => {
     printWindow.document.write(htmlContent);
     printWindow.document.close();
   }, [filtros, filteredAcudientes, participantes]);
+
+  const handleExportCSV = useCallback(() => {
+    const headers = [
+      { key: 'tipo_documento', label: 'Tipo Documento' },
+      { key: 'numero_documento', label: 'Número Documento' },
+      { key: 'nombres', label: 'Nombres' },
+      { key: 'apellidos', label: 'Apellidos' },
+      { key: 'nombre_completo', label: 'Nombre Completo' },
+      { key: 'parentesco', label: 'Parentesco' },
+      { key: 'telefono', label: 'Teléfono' },
+      { key: 'email', label: 'Email' },
+      { key: 'direccion', label: 'Dirección' },
+      { key: 'participante_id', label: 'ID Participante' },
+      { key: 'participante_nombre', label: 'Nombre Participante' },
+      { key: 'participante_documento', label: 'Documento Participante' }
+    ];
+
+    const csvData = filteredAcudientes.map(acudiente => {
+      const participante = participantes.find(p =>
+        (p.id_participante || p.id) === acudiente.id_participante
+      );
+
+      return {
+        tipo_documento: acudiente.tipo_documento || '',
+        numero_documento: acudiente.numero_documento || '',
+        nombres: acudiente.nombres || '',
+        apellidos: acudiente.apellidos || '',
+        nombre_completo: `${acudiente.nombres || ''} ${acudiente.apellidos || ''}`.trim(),
+        parentesco: acudiente.parentesco || '',
+        telefono: acudiente.telefono || '',
+        email: acudiente.email || '',
+        direccion: acudiente.direccion || '',
+        participante_id: acudiente.id_participante || '',
+        participante_nombre: formatParticipantName(participante),
+        participante_documento: participante?.numero_documento || ''
+      };
+    });
+
+    const csvContent = arrayToCSV(csvData, headers);
+    const filename = `acudientes_${new Date().toISOString().split('T')[0]}.csv`;
+    downloadCSV(csvContent, filename);
+  }, [filteredAcudientes, participantes]);
 
   if (loading) {
     return (
@@ -301,19 +354,15 @@ const AcudientesComponent = () => {
   ];
 
   return (
-    <DashboardLayout 
-      title="Gestión de Acudientes" 
+    <DashboardLayout
+      title="Gestión de Acudientes"
       subtitle="Administra los acudientes de los participantes"
       extraActions={
         <div className="flex space-x-3">
-          <button
-            onClick={handleExportPDF}
-            className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
-            title="Exportar lista filtrada a PDF"
-          >
-            <i className="fas fa-file-pdf mr-2"></i>
-            Exportar PDF
-          </button>
+          <ExportDropdown
+            onExportPDF={handleExportPDF}
+            onExportCSV={handleExportCSV}
+          />
           <button
             onClick={() => crearModal.openModal()}
             className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"

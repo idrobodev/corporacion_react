@@ -1,8 +1,15 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import Sidebar from '../../components/layout/Sidebar';
-import { DataTable, LoadingSpinner } from 'components/UI';
+import { DataTable, LoadingSpinner, ExportDropdown } from 'components/UI';
 import { dbService } from 'shared/services';
+import {
+  arrayToCSV,
+  downloadCSV,
+  formatCurrencyForCSV,
+  formatDateForCSV,
+  normalizeStatus
+} from 'shared/utils/exportUtils';
 
 const PaymentsList = () => {
   const [payments, setPayments] = useState([]);
@@ -152,7 +159,7 @@ const PaymentsList = () => {
                     <td>${formatCurrency(payment.monto || 0)}</td>
                     <td>${payment.fechaVencimiento ? formatDate(payment.fechaVencimiento) : 'N/A'}</td>
                     <td>${payment.fechaPago ? formatDate(payment.fechaPago) : '-'}</td>
-                    <td class="${statusClass}">${payment.estado || 'N/A'}</td>
+                    <td class="${statusClass}">${normalizeStatus(payment.estado)}</td>
                     <td>${payment.metodoPago || '-'}</td>
                   </tr>
                 `;
@@ -185,6 +192,42 @@ const PaymentsList = () => {
     printWindow.document.write(htmlContent);
     printWindow.document.close();
   }, [filterStatus, filteredPayments]);
+
+  const handleExportCSV = useCallback(() => {
+    const headers = [
+      { key: 'id', label: 'ID' },
+      { key: 'participante', label: 'Participante' },
+      { key: 'mes', label: 'Mes' },
+      { key: 'anio', label: 'Año' },
+      { key: 'monto', label: 'Monto' },
+      { key: 'monto_formateado', label: 'Monto (Formateado)' },
+      { key: 'fecha_vencimiento', label: 'Fecha Vencimiento' },
+      { key: 'fecha_pago', label: 'Fecha Pago' },
+      { key: 'estado', label: 'Estado' },
+      { key: 'metodo_pago', label: 'Método de Pago' },
+      { key: 'comprobante', label: 'Comprobante' },
+      { key: 'observaciones', label: 'Observaciones' }
+    ];
+
+    const csvData = filteredPayments.map(payment => ({
+      id: payment.id || '',
+      participante: payment.participante || '',
+      mes: payment.mes || '',
+      anio: payment.anio || '',
+      monto: payment.monto || 0,
+      monto_formateado: formatCurrencyForCSV(payment.monto || 0),
+      fecha_vencimiento: formatDateForCSV(payment.fechaVencimiento),
+      fecha_pago: formatDateForCSV(payment.fechaPago),
+      estado: normalizeStatus(payment.estado),
+      metodo_pago: payment.metodoPago || '',
+      comprobante: payment.comprobante || '',
+      observaciones: payment.observaciones || ''
+    }));
+
+    const csvContent = arrayToCSV(csvData, headers);
+    const filename = `mensualidades_${new Date().toISOString().split('T')[0]}.csv`;
+    downloadCSV(csvContent, filename);
+  }, [filteredPayments]);
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('es-CO', {
@@ -375,14 +418,10 @@ const PaymentsList = () => {
                     <option value="PENDIENTE">Pendientes</option>
                     <option value="VENCIDA">Vencidas</option>
                   </select>
-                  <button
-                    onClick={handleExportPDF}
-                    className="bg-red-600 text-white px-4 py-2 rounded-xl font-Poppins font-medium hover:bg-red-700 transition-colors duration-200 flex items-center space-x-2"
-                    title="Exportar lista filtrada a PDF"
-                  >
-                    <i className="fas fa-file-pdf"></i>
-                    <span>Exportar PDF</span>
-                  </button>
+                  <ExportDropdown
+                    onExportPDF={handleExportPDF}
+                    onExportCSV={handleExportCSV}
+                  />
                   <Link
                     to="/dashboard/payments/new"
                     className="bg-primary text-white px-4 py-2 rounded-xl font-Poppins font-medium hover:bg-primary-dark transition-colors duration-200 flex items-center space-x-2"

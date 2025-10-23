@@ -1,15 +1,25 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import DashboardLayout from "components/layout/DashboardLayout";
 import { dbService } from "shared/services";
-import { FilterBar, StatsGrid, DataTable, ActionDropdown, StatusToggle, FormInput, FormSelect, FormGroup } from "components/UI";
+import { FilterBar, StatsGrid, DataTable, ActionDropdown, StatusToggle, FormInput, FormSelect, FormGroup, ExportDropdown } from "components/UI";
 import { ViewDetailsModal, EditFormModal, CreateFormModal } from "components/common";
 import { useFilters, useModal } from "shared/hooks";
-import { 
-  validateParticipanteDocumentoUnico, 
-  validateFechaNacimiento, 
+import {
+  validateParticipanteDocumentoUnico,
+  validateFechaNacimiento,
   validateFechaIngreso,
-  validateSedeExists 
+  validateSedeExists
 } from "shared/utils/validationUtils";
+import {
+  arrayToCSV,
+  downloadCSV,
+  calculateAge,
+  formatDateForCSV,
+  formatParticipantName,
+  formatSede,
+  normalizeStatus,
+  formatGender
+} from "shared/utils/exportUtils";
 // import jsPDF from 'jspdf'; // Temporarily disabled - not available in Docker dev
 
 const Participantes = React.memo(() => {
@@ -142,19 +152,6 @@ const Participantes = React.memo(() => {
     const printWindow = window.open('', '_blank');
     const currentDate = new Date().toLocaleDateString('es-ES');
 
-    // Helper function to calculate age from fecha_nacimiento
-    const calcularEdad = (fechaNacimiento) => {
-      if (!fechaNacimiento) return 'N/A';
-      const birthDate = new Date(fechaNacimiento);
-      const today = new Date();
-      let age = today.getFullYear() - birthDate.getFullYear();
-      const monthDiff = today.getMonth() - birthDate.getMonth();
-      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-        age--;
-      }
-      return `${age} años`;
-    };
-
     // Generate HTML content for PDF
     const htmlContent = `
       <!DOCTYPE html>
@@ -257,35 +254,30 @@ const Participantes = React.memo(() => {
               </tr>
             </thead>
             <tbody>
-              ${filteredParticipantes.map(participante => {
-                const nombreCompleto = participante.nombres && participante.apellidos
-                  ? `${participante.nombres} ${participante.apellidos}`
-                  : participante.nombre || 'N/A';
-                
-                const edad = calcularEdad(participante.fecha_nacimiento);
-                const sedeNombre = participante.sede?.direccion || participante.sede || 'N/A';
-                const estado = participante.estado === 'ACTIVO' || participante.estado === 'Activo' ? 'Activo' :
-                              participante.estado === 'INACTIVO' || participante.estado === 'Inactivo' ? 'Inactivo' : 'N/A';
-                
-                return `
-                  <tr>
-                    <td>${nombreCompleto}</td>
-                    <td>${edad}</td>
-                    <td>${participante.genero === 'MASCULINO' ? 'Masculino' : participante.genero === 'FEMENINO' ? 'Femenino' : 'N/A'}</td>
-                    <td>${participante.telefono || 'N/A'}</td>
-                    <td>${sedeNombre}</td>
-                    <td>${estado}</td>
-                  </tr>
-                `;
-              }).join('')}
+              ${filteredParticipantes.map(participante => `
+                <tr>
+                  <td>${formatParticipantName(participante)}</td>
+                  <td>${calculateAge(participante.fecha_nacimiento) || 'N/A'}</td>
+                  <td>${formatGender(participante.genero)}</td>
+                  <td>${participante.telefono || 'N/A'}</td>
+                  <td>${formatSede(participante.sede)}</td>
+                  <td>${normalizeStatus(participante.estado)}</td>
+                </tr>
+              `).join('')}
             </tbody>
           </table>
 
           <div class="stats">
             <h3>Estadísticas:</h3>
             <p><strong>Total de participantes:</strong> ${filteredParticipantes.length}</p>
-            <p><strong>Activos:</strong> ${filteredParticipantes.filter(p => p.estado === 'ACTIVO' || p.estado === 'Activo').length}</p>
-            <p><strong>Inactivos:</strong> ${filteredParticipantes.filter(p => p.estado === 'INACTIVO' || p.estado === 'Inactivo').length}</p>
+            <p><strong>Activos:</strong> ${filteredParticipantes.filter(p => {
+              const upper = String(p.estado || '').toUpperCase();
+              return upper === 'ACTIVO';
+            }).length}</p>
+            <p><strong>Inactivos:</strong> ${filteredParticipantes.filter(p => {
+              const upper = String(p.estado || '').toUpperCase();
+              return upper === 'INACTIVO';
+            }).length}</p>
           </div>
 
           <script>
@@ -303,6 +295,42 @@ const Participantes = React.memo(() => {
     printWindow.document.write(htmlContent);
     printWindow.document.close();
   }, [filtros, filteredParticipantes]);
+
+  const handleExportCSV = useCallback(() => {
+    const headers = [
+      { key: 'tipo_documento', label: 'Tipo Documento' },
+      { key: 'numero_documento', label: 'Número Documento' },
+      { key: 'nombres', label: 'Nombres' },
+      { key: 'apellidos', label: 'Apellidos' },
+      { key: 'nombre_completo', label: 'Nombre Completo' },
+      { key: 'fecha_nacimiento', label: 'Fecha Nacimiento' },
+      { key: 'edad', label: 'Edad' },
+      { key: 'genero', label: 'Género' },
+      { key: 'telefono', label: 'Teléfono' },
+      { key: 'sede', label: 'Sede' },
+      { key: 'fecha_ingreso', label: 'Fecha Ingreso' },
+      { key: 'estado', label: 'Estado' }
+    ];
+
+    const csvData = filteredParticipantes.map(participante => ({
+      tipo_documento: participante.tipo_documento || '',
+      numero_documento: participante.numero_documento || '',
+      nombres: participante.nombres || '',
+      apellidos: participante.apellidos || '',
+      nombre_completo: formatParticipantName(participante),
+      fecha_nacimiento: formatDateForCSV(participante.fecha_nacimiento),
+      edad: calculateAge(participante.fecha_nacimiento),
+      genero: formatGender(participante.genero),
+      telefono: participante.telefono || '',
+      sede: formatSede(participante.sede),
+      fecha_ingreso: formatDateForCSV(participante.fecha_ingreso),
+      estado: normalizeStatus(participante.estado)
+    }));
+
+    const csvContent = arrayToCSV(csvData, headers);
+    const filename = `participantes_${new Date().toISOString().split('T')[0]}.csv`;
+    downloadCSV(csvContent, filename);
+  }, [filteredParticipantes]);
 
   if (loading) {
     return (
@@ -325,14 +353,10 @@ const Participantes = React.memo(() => {
   return (
     <DashboardLayout title="Gestión de Participantes" subtitle="Administra los participantes de la fundación" extraActions={
       <div className="flex space-x-3">
-        <button
-          onClick={() => handleExportPDF()}
-          className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
-          title="Exportar lista filtrada a PDF"
-        >
-          <i className="fas fa-file-pdf mr-2"></i>
-          Exportar PDF
-        </button>
+        <ExportDropdown
+          onExportPDF={handleExportPDF}
+          onExportCSV={handleExportCSV}
+        />
         <button
           onClick={() => abrirModal('crear', null)}
           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
