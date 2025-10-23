@@ -407,11 +407,11 @@ const PaymentsList = () => {
                     Administra los pagos mensuales de los participantes
                   </p>
                 </div>
-                <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-3">
                   <select
                     value={filterStatus}
                     onChange={(e) => setFilterStatus(e.target.value)}
-                    className="border border-gray-300 rounded-lg px-3 py-2 text-sm font-Poppins focus:ring-2 focus:ring-primary focus:border-transparent"
+                    className="border border-gray-300 rounded-lg px-3 py-2 text-sm font-Poppins focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
                     <option value="TODOS">Todos los Estados</option>
                     <option value="PAGADA">Pagadas</option>
@@ -424,7 +424,7 @@ const PaymentsList = () => {
                   />
                   <Link
                     to="/dashboard/payments/new"
-                    className="bg-primary text-white px-4 py-2 rounded-xl font-Poppins font-medium hover:bg-primary-dark transition-colors duration-200 flex items-center space-x-2"
+                    className="bg-blue-600 text-white px-4 py-2 rounded-lg font-Poppins font-medium hover:bg-blue-700 transition-colors duration-200 flex items-center space-x-2"
                   >
                     <i className="fas fa-plus"></i>
                     <span>Registrar Pago</span>
