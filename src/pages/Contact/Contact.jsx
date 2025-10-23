@@ -46,7 +46,7 @@ const Contact = () => {
     {
       name: "Facebook",
       icon: "📘",
-      url: "#",
+      url: "https://www.facebook.com/todoporunalmacorporacion/",
       color: "from-blue-600 to-blue-700",
       hoverColor: "hover:from-blue-700 hover:to-blue-800",
     },
