@@ -721,6 +721,54 @@ class ApiService {
     }
   }
 
+  // Crear nuevo participante
+  async createParticipante(participanteData) {
+    try {
+      const response = await dashboardClient.post('/participantes', participanteData);
+      return { data: response.data, error: null };
+    } catch (error) {
+      console.error('Error creando participante:', error);
+      return {
+        data: null,
+        error: {
+          message: error.message || 'Error al crear participante'
+        }
+      };
+    }
+  }
+
+  // Actualizar participante
+  async updateParticipante(id, participanteData) {
+    try {
+      const response = await dashboardClient.put(`/participantes/${id}`, participanteData);
+      return { data: response.data, error: null };
+    } catch (error) {
+      console.error('Error actualizando participante:', error);
+      return {
+        data: null,
+        error: {
+          message: error.message || 'Error al actualizar participante'
+        }
+      };
+    }
+  }
+
+  // Eliminar participante
+  async deleteParticipante(id) {
+    try {
+      const response = await dashboardClient.delete(`/participantes/${id}`);
+      return { data: response.data, error: null };
+    } catch (error) {
+      console.error('Error eliminando participante:', error);
+      return {
+        data: null,
+        error: {
+          message: error.message || 'Error al eliminar participante'
+        }
+      };
+    }
+  }
+
   // ==================== MENSUALIDADES ====================
 
   // Obtener lista de mensualidades

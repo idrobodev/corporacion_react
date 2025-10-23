@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import Sidebar from '../../components/layout/Sidebar';
 import { DataTable, LoadingSpinner } from 'components/UI';
@@ -34,6 +34,157 @@ const PaymentsList = () => {
     if (filterStatus === 'TODOS') return true;
     return payment.estado === filterStatus;
   });
+
+  // Función para exportar a PDF
+  const handleExportPDF = useCallback(() => {
+    const printWindow = window.open('', '_blank');
+    const currentDate = new Date().toLocaleDateString('es-ES');
+
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Lista de Mensualidades - ${currentDate}</title>
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              margin: 20px;
+              color: #333;
+            }
+            .header {
+              text-align: center;
+              margin-bottom: 30px;
+              border-bottom: 2px solid #333;
+              padding-bottom: 20px;
+            }
+            .header h1 {
+              color: #2563eb;
+              margin: 0;
+              font-size: 24px;
+            }
+            .filters {
+              margin-bottom: 20px;
+              background: #f8f9fa;
+              padding: 15px;
+              border-radius: 5px;
+            }
+            .filters h3 {
+              margin: 0 0 10px 0;
+              color: #495057;
+            }
+            .filters p {
+              margin: 5px 0;
+              font-size: 14px;
+            }
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              margin-top: 20px;
+            }
+            th, td {
+              border: 1px solid #ddd;
+              padding: 8px 12px;
+              text-align: left;
+            }
+            th {
+              background-color: #f8f9fa;
+              font-weight: bold;
+              color: #495057;
+            }
+            tr:nth-child(even) {
+              background-color: #f9f9f9;
+            }
+            .stats {
+              margin-top: 30px;
+              background: #e3f2fd;
+              padding: 15px;
+              border-radius: 5px;
+            }
+            .stats h3 {
+              margin: 0 0 10px 0;
+              color: #1976d2;
+            }
+            .stats p {
+              margin: 5px 0;
+              font-size: 14px;
+            }
+            .status-pagada { color: #059669; font-weight: bold; }
+            .status-pendiente { color: #d97706; font-weight: bold; }
+            .status-vencida { color: #dc2626; font-weight: bold; }
+            @media print {
+              body { margin: 0; }
+              .no-print { display: none; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1>Lista de Mensualidades</h1>
+            <p>Corporación Todo por un Alma</p>
+            <p>Fecha de generación: ${currentDate}</p>
+          </div>
+
+          <div class="filters">
+            <h3>Filtros aplicados:</h3>
+            <p><strong>Estado:</strong> ${filterStatus === 'TODOS' ? 'Todos los estados' : filterStatus}</p>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Participante</th>
+                <th>Mes</th>
+                <th>Monto</th>
+                <th>Vencimiento</th>
+                <th>Fecha Pago</th>
+                <th>Estado</th>
+                <th>Método de Pago</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${filteredPayments.map(payment => {
+                const statusClass = payment.estado === 'PAGADA' ? 'status-pagada' :
+                                 payment.estado === 'PENDIENTE' ? 'status-pendiente' : 'status-vencida';
+                return `
+                  <tr>
+                    <td>${payment.participante || 'N/A'}</td>
+                    <td>${payment.mes || 'N/A'}</td>
+                    <td>${formatCurrency(payment.monto || 0)}</td>
+                    <td>${payment.fechaVencimiento ? formatDate(payment.fechaVencimiento) : 'N/A'}</td>
+                    <td>${payment.fechaPago ? formatDate(payment.fechaPago) : '-'}</td>
+                    <td class="${statusClass}">${payment.estado || 'N/A'}</td>
+                    <td>${payment.metodoPago || '-'}</td>
+                  </tr>
+                `;
+              }).join('')}
+            </tbody>
+          </table>
+
+          <div class="stats">
+            <h3>Estadísticas:</h3>
+            <p><strong>Total de mensualidades:</strong> ${filteredPayments.length}</p>
+            <p><strong>Pagadas:</strong> ${filteredPayments.filter(p => p.estado === 'PAGADA').length}</p>
+            <p><strong>Pendientes:</strong> ${filteredPayments.filter(p => p.estado === 'PENDIENTE').length}</p>
+            <p><strong>Vencidas:</strong> ${filteredPayments.filter(p => p.estado === 'VENCIDA').length}</p>
+            <p><strong>Total recaudado:</strong> ${formatCurrency(filteredPayments.filter(p => p.estado === 'PAGADA').reduce((sum, p) => sum + (p.monto || 0), 0))}</p>
+            <p><strong>Total pendiente:</strong> ${formatCurrency(filteredPayments.filter(p => p.estado !== 'PAGADA').reduce((sum, p) => sum + (p.monto || 0), 0))}</p>
+          </div>
+
+          <script>
+            window.onload = function() {
+              window.print();
+              setTimeout(function() {
+                window.close();
+              }, 1000);
+            }
+          </script>
+        </body>
+      </html>
+    `;
+
+    printWindow.document.write(htmlContent);
+    printWindow.document.close();
+  }, [filterStatus, filteredPayments]);
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('es-CO', {
@@ -224,6 +375,14 @@ const PaymentsList = () => {
                     <option value="PENDIENTE">Pendientes</option>
                     <option value="VENCIDA">Vencidas</option>
                   </select>
+                  <button
+                    onClick={handleExportPDF}
+                    className="bg-red-600 text-white px-4 py-2 rounded-xl font-Poppins font-medium hover:bg-red-700 transition-colors duration-200 flex items-center space-x-2"
+                    title="Exportar lista filtrada a PDF"
+                  >
+                    <i className="fas fa-file-pdf"></i>
+                    <span>Exportar PDF</span>
+                  </button>
                   <Link
                     to="/dashboard/payments/new"
                     className="bg-primary text-white px-4 py-2 rounded-xl font-Poppins font-medium hover:bg-primary-dark transition-colors duration-200 flex items-center space-x-2"

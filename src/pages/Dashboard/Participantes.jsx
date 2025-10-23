@@ -142,6 +142,19 @@ const Participantes = React.memo(() => {
     const printWindow = window.open('', '_blank');
     const currentDate = new Date().toLocaleDateString('es-ES');
 
+    // Helper function to calculate age from fecha_nacimiento
+    const calcularEdad = (fechaNacimiento) => {
+      if (!fechaNacimiento) return 'N/A';
+      const birthDate = new Date(fechaNacimiento);
+      const today = new Date();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+      return `${age} años`;
+    };
+
     // Generate HTML content for PDF
     const htmlContent = `
       <!DOCTYPE html>
@@ -244,24 +257,35 @@ const Participantes = React.memo(() => {
               </tr>
             </thead>
             <tbody>
-              ${filteredParticipantes.map(participante => `
-                <tr>
-                  <td>${participante.nombre || 'N/A'}</td>
-                  <td>${participante.edad || 'N/A'}</td>
-                  <td>${participante.genero || 'N/A'}</td>
-                  <td>${participante.telefono || 'N/A'}</td>
-                  <td>${participante.sede || 'N/A'}</td>
-                  <td>${participante.estado || 'N/A'}</td>
-                </tr>
-              `).join('')}
+              ${filteredParticipantes.map(participante => {
+                const nombreCompleto = participante.nombres && participante.apellidos
+                  ? `${participante.nombres} ${participante.apellidos}`
+                  : participante.nombre || 'N/A';
+                
+                const edad = calcularEdad(participante.fecha_nacimiento);
+                const sedeNombre = participante.sede?.direccion || participante.sede || 'N/A';
+                const estado = participante.estado === 'ACTIVO' || participante.estado === 'Activo' ? 'Activo' :
+                              participante.estado === 'INACTIVO' || participante.estado === 'Inactivo' ? 'Inactivo' : 'N/A';
+                
+                return `
+                  <tr>
+                    <td>${nombreCompleto}</td>
+                    <td>${edad}</td>
+                    <td>${participante.genero === 'MASCULINO' ? 'Masculino' : participante.genero === 'FEMENINO' ? 'Femenino' : 'N/A'}</td>
+                    <td>${participante.telefono || 'N/A'}</td>
+                    <td>${sedeNombre}</td>
+                    <td>${estado}</td>
+                  </tr>
+                `;
+              }).join('')}
             </tbody>
           </table>
 
           <div class="stats">
             <h3>Estadísticas:</h3>
             <p><strong>Total de participantes:</strong> ${filteredParticipantes.length}</p>
-            <p><strong>Activos:</strong> ${filteredParticipantes.filter(p => p.estado === 'Activo').length}</p>
-            <p><strong>Inactivos:</strong> ${filteredParticipantes.filter(p => p.estado === 'Inactivo').length}</p>
+            <p><strong>Activos:</strong> ${filteredParticipantes.filter(p => p.estado === 'ACTIVO' || p.estado === 'Activo').length}</p>
+            <p><strong>Inactivos:</strong> ${filteredParticipantes.filter(p => p.estado === 'INACTIVO' || p.estado === 'Inactivo').length}</p>
           </div>
 
           <script>
