@@ -14,7 +14,6 @@ import {
 import {
   arrayToCSV,
   downloadCSV,
-  formatDateForCSV,
   formatParticipantName,
   formatDocument
 } from "shared/utils/exportUtils";
