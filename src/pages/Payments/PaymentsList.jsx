@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import Sidebar from '../../components/layout/Sidebar';
+import DashboardLayout from 'components/layout/DashboardLayout';
 import { DataTable, LoadingSpinner, ExportDropdown } from 'components/UI';
 import { dbService } from 'shared/services';
 import {
@@ -14,8 +14,6 @@ import {
 const PaymentsList = () => {
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [filterStatus, setFilterStatus] = useState('TODOS');
 
   useEffect(() => {
@@ -34,8 +32,6 @@ const PaymentsList = () => {
     }
   };
 
-  const toggleSidebarOpen = () => setSidebarOpen(!sidebarOpen);
-  const toggleSidebarCollapsed = () => setSidebarCollapsed(!sidebarCollapsed);
 
   const filteredPayments = payments.filter(payment => {
     if (filterStatus === 'TODOS') return true;
@@ -371,71 +367,41 @@ const PaymentsList = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-        <div className="flex">
-          <Sidebar isOpen={sidebarOpen} onToggle={toggleSidebarOpen} isCollapsed={sidebarCollapsed} onToggleCollapse={toggleSidebarCollapsed} />
-          <main className={`flex-1 transition-all duration-300 ${sidebarCollapsed ? 'md:ml-16' : 'md:ml-64'} pt-20`}>
-            <div className="flex items-center justify-center h-screen">
-              <LoadingSpinner size="xl" text="Cargando mensualidades..." />
-            </div>
-          </main>
-        </div>
-      </div>
+      <DashboardLayout title="Mensualidades" subtitle="Pagadas, pendientes y vencidas" loading={true} loadingText="Cargando mensualidades..." />
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      <div className="flex">
-        <Sidebar 
-          isOpen={sidebarOpen} 
-          onToggle={toggleSidebarOpen} 
-          isCollapsed={sidebarCollapsed} 
-          onToggleCollapse={toggleSidebarCollapsed} 
-        />
-        
-        <main className={`flex-1 transition-all duration-300 ${sidebarCollapsed ? 'md:ml-16' : 'md:ml-64'} pt-20`}>
-          {/* Header */}
-          <header className="bg-white shadow-sm border-b border-gray-200 sticky top-16 z-10">
-            <div className="px-6 py-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h1 className="text-2xl font-Lato font-bold text-gray-800">
-                    Gestión de Mensualidades
-                  </h1>
-                  <p className="text-sm font-Poppins text-gray-600 mt-1">
-                    Administra los pagos mensuales de los participantes
-                  </p>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <select
-                    value={filterStatus}
-                    onChange={(e) => setFilterStatus(e.target.value)}
-                    className="border border-gray-300 rounded-lg px-3 py-2 text-sm font-Poppins focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="TODOS">Todos los Estados</option>
-                    <option value="PAGADA">Pagadas</option>
-                    <option value="PENDIENTE">Pendientes</option>
-                    <option value="VENCIDA">Vencidas</option>
-                  </select>
-                  <ExportDropdown
-                    onExportPDF={handleExportPDF}
-                    onExportCSV={handleExportCSV}
-                  />
-                  <Link
-                    to="/dashboard/payments/new"
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg font-Poppins font-medium hover:bg-blue-700 transition-colors duration-200 flex items-center space-x-2"
-                  >
-                    <i className="fas fa-plus"></i>
-                    <span>Registrar Pago</span>
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </header>
-
-          {/* Content */}
-          <div className="p-6">
+    <DashboardLayout
+      title="Gestión de Mensualidades"
+      subtitle="Administra los pagos mensuales de los participantes"
+      extraActions={
+        <div className="flex space-x-3">
+          <select
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+            className="border border-gray-300 rounded-lg px-3 py-2 text-sm font-Poppins focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          >
+            <option value="TODOS">Todos los Estados</option>
+            <option value="PAGADA">Pagadas</option>
+            <option value="PENDIENTE">Pendientes</option>
+            <option value="VENCIDA">Vencidas</option>
+          </select>
+          <ExportDropdown
+            onExportPDF={handleExportPDF}
+            onExportCSV={handleExportCSV}
+          />
+          <Link
+            to="/dashboard/payments/new"
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg font-Poppins font-medium hover:bg-blue-700 transition-colors duration-200 flex items-center space-x-2"
+          >
+            <i className="fas fa-plus"></i>
+            <span>Registrar Pago</span>
+          </Link>
+        </div>
+      }
+    >
+      <section className="px-6 py-6">
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
               <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
@@ -512,7 +478,13 @@ const PaymentsList = () => {
               </div>
             </div>
 
-            {/* Payments Table */}
+        {/* Payments Table */}
+        <div className="mt-6">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div className="p-6 border-b border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-800">Lista de Mensualidades</h3>
+            </div>
+
             <DataTable
               data={filteredPayments}
               columns={columns}
@@ -523,12 +495,11 @@ const PaymentsList = () => {
               onRowClick={(payment) => {
                 window.location.href = `/dashboard/payments/${payment.id}`;
               }}
-              className="mb-8"
             />
           </div>
-        </main>
-      </div>
-    </div>
+        </div>
+      </section>
+    </DashboardLayout>
   );
 };
 
