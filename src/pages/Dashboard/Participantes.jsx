@@ -327,12 +327,10 @@ const Participantes = React.memo(() => {
       estado: normalizeStatus(participante.estado)
     }));
 
-
     const csvContent = arrayToCSV(csvData, headers);
-
     const filename = `participantes_${new Date().toISOString().split('T')[0]}.csv`;
     downloadCSV(csvContent, filename);
-  }, [filteredParticipantes, filtros]);
+  }, []);
 
   if (loading) {
     return (

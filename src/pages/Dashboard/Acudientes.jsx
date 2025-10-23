@@ -307,12 +307,10 @@ const AcudientesComponent = () => {
       };
     });
 
-
     const csvContent = arrayToCSV(csvData, headers);
-
     const filename = `acudientes_${new Date().toISOString().split('T')[0]}.csv`;
     downloadCSV(csvContent, filename);
-  }, [filteredAcudientes, participantes, filtros]);
+  }, []);
 
   if (loading) {
     return (

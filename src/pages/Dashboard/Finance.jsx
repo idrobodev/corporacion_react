@@ -494,12 +494,10 @@ const Finance = React.memo(() => {
       observaciones: m.observaciones || 'N/A'
     }));
 
-
     const csvContent = arrayToCSV(csvData, headers);
-
     const filename = `mensualidades_${new Date().toISOString().split('T')[0]}.csv`;
     downloadCSV(csvContent, filename);
-  }, [filteredMensualidades, getMonthLabel, filters, sedes]);
+  }, []);
 
   if (loading) {
     return (
