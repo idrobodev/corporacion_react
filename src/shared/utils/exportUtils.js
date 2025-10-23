@@ -194,7 +194,7 @@ export const createEnhancedCSV = (options) => {
         if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
           return `"${stringValue.replace(/"/g, '""')}"`;
         }
-        return `"${stringValue}"`;
+        return stringValue; // No envolver en comillas si no es necesario
       }).join(',');
       sections.push(dataRow);
     });
