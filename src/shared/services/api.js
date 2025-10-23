@@ -1,12 +1,33 @@
 // Servicio API   
 import axios from 'axios';
 
+// Función para determinar la URL base correcta de la API
+const getApiBaseUrl = (defaultUrl) => {
+  // Si hay una variable de entorno configurada, úsala
+  if (process.env.REACT_APP_AUTH_API_BASE_URL || process.env.REACT_APP_DASHBOARD_API_BASE_URL) {
+    return defaultUrl;
+  }
+
+  // Detectar automáticamente el dominio actual
+  const currentOrigin = window.location.origin; // ej: https://www.todoporunalma.org o https://todoporunalma.org
+
+  // Si estamos en www, usar la URL sin www para la API (hasta que el backend soporte www)
+  if (currentOrigin === 'https://www.todoporunalma.org') {
+    return 'https://todoporunalma.org';
+  }
+
+  // Para desarrollo local o dominio principal, usar el origen actual
+  return currentOrigin;
+};
+
 // Configuración base de las APIs
+const API_BASE_DOMAIN = getApiBaseUrl('https://todoporunalma.org');
+
 const AUTH_API_BASE_URL = process.env.REACT_APP_AUTH_API_BASE_URL ||
-  'https://todoporunalma.org/api/auth';
+  `${API_BASE_DOMAIN}/api/auth`;
 
 const DASHBOARD_API_BASE_URL = process.env.REACT_APP_DASHBOARD_API_BASE_URL ||
-  'https://todoporunalma.org/api/dashboard';
+  `${API_BASE_DOMAIN}/api/dashboard`;
 
 console.log('🔧 AUTH_API_BASE_URL configurada como:', AUTH_API_BASE_URL);
 console.log('🔧 DASHBOARD_API_BASE_URL configurada como:', DASHBOARD_API_BASE_URL);
