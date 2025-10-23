@@ -3,7 +3,7 @@ import DashboardLayout from "components/layout/DashboardLayout";
 import { dbService, ROLES } from "shared/services";
 import { FilterBar } from "components/UI/Filter";
 import { StatsGrid } from "components/UI/Card";
-import { DataTable } from "components/UI/Table";
+import { DataTable, ActionDropdown } from "components/UI/Table";
 import { ViewDetailsModal, EditFormModal, CreateFormModal } from "components/common/CRUDModals";
 import { useFilters, useModal } from "shared/hooks";
 import { validateEmail } from "shared/utils/validationUtils";
