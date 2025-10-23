@@ -251,16 +251,20 @@ export const generateStatistics = (data, statusField = 'estado') => {
 export const downloadCSV = (csvContent, filename) => {
   // Add UTF-8 BOM for proper Excel encoding of special characters (ñ, á, é, í, ó, ú)
   const BOM = '\uFEFF';
+
+  // Ensure filename has .csv extension
+  const csvFilename = filename.endsWith('.csv') ? filename : `${filename}.csv`;
+
   const blob = new Blob([BOM + csvContent], {
     type: 'text/csv;charset=utf-8;'
   });
-  
+
   const link = document.createElement('a');
 
   if (link.download !== undefined) {
     const url = URL.createObjectURL(blob);
     link.setAttribute('href', url);
-    link.setAttribute('download', filename);
+    link.setAttribute('download', csvFilename);
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();
