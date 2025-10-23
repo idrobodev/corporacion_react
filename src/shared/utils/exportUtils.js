@@ -255,7 +255,10 @@ export const downloadCSV = (csvContent, filename) => {
   // Ensure filename has .csv extension
   const csvFilename = filename.endsWith('.csv') ? filename : `${filename}.csv`;
 
-  const blob = new Blob([BOM + csvContent], {
+  // Ensure proper line endings for Excel (CRLF)
+  const csvContentWithProperLineEndings = csvContent.replace(/\n/g, '\r\n');
+
+  const blob = new Blob([BOM + csvContentWithProperLineEndings], {
     type: 'text/csv;charset=utf-8;'
   });
 
