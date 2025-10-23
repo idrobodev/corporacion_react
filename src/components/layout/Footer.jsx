@@ -90,7 +90,7 @@ const Footer = () => {
           <div className="py-4 font-Poppins">
             <p className="flex items-center">
               <i className="fas fa-phone-alt mr-3"></i>
-              <span>Teléfono Principal: 3145702708</span>
+              <span>+57 3145702708</span>
             </p>
             <p className="py-2 flex items-center">
               <i className="far fa-envelope mr-3"></i> 
