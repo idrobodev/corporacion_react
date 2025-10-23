@@ -22,6 +22,9 @@ export * from './Table';
 // Filter components
 export * from './Filter';
 
+// Export components
+export { default as ExportDropdown } from './ExportDropdown';
+
 // Badge components
 export * from './Badge';
 
