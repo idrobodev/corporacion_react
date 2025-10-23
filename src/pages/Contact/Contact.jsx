@@ -67,7 +67,7 @@ const Contact = () => {
     {
       name: "YouTube",
       icon: "📺",
-      url: "#",
+      url: "https://www.youtube.com/@hermanamildrey",
       color: "from-red-500 to-red-600",
       hoverColor: "hover:from-red-600 hover:to-red-700",
     },
