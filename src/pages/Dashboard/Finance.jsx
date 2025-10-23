@@ -148,10 +148,10 @@ const Finance = React.memo(() => {
         });
 
         // Asegurar que siempre sean arrays (API service ya extrae el nested data)
-        const mensualidadesData = Array.isArray(mensRes.data) ? mensRes.data : [];
-        const participantesData = Array.isArray(partsRes.data) ? partsRes.data : [];
-        const sedesData = Array.isArray(sedesRes.data) ? sedesRes.data : [];
-        const acudientesData = Array.isArray(acudRes.data) ? acudRes.data : [];
+        const mensualidadesData = Array.isArray(mensRes.data) ? mensRes.data : (mensRes.data?.data ? mensRes.data.data : []);
+        const participantesData = Array.isArray(partsRes.data) ? partsRes.data : (partsRes.data?.data ? partsRes.data.data : []);
+        const sedesData = Array.isArray(sedesRes.data) ? sedesRes.data : (sedesRes.data?.data ? sedesRes.data.data : []);
+        const acudientesData = Array.isArray(acudRes.data) ? acudRes.data : (acudRes.data?.data ? acudRes.data.data : []);
 
         console.log('🔍 Estructura de mensualidadesData:', {
           isArray: Array.isArray(mensualidadesData),
