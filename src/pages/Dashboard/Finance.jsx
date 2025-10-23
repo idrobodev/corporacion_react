@@ -17,7 +17,7 @@ import {
 } from "components/UI";
 import { validateMensualidadRelations } from "shared/utils/validationUtils";
 import {
-  arrayToCSV,
+  createEnhancedCSV,
   downloadCSV,
   formatCurrencyForCSV,
   formatDateForCSV,
@@ -464,9 +464,12 @@ const Finance = React.memo(() => {
     const headers = [
       { key: 'id', label: 'ID' },
       { key: 'participant_name', label: 'Participante' },
+      { key: 'participant_documento', label: 'Documento Participante' },
       { key: 'acudiente_name', label: 'Acudiente' },
+      { key: 'acudiente_documento', label: 'Documento Acudiente' },
       { key: 'mes', label: 'Mes' },
       { key: 'año', label: 'Año' },
+      { key: 'periodo', label: 'Período' },
       { key: 'valor', label: 'Valor' },
       { key: 'estado', label: 'Estado' },
       { key: 'metodo_pago', label: 'Método de Pago' },
@@ -475,22 +478,100 @@ const Finance = React.memo(() => {
     ];
 
     const csvData = filteredMensualidades.map(m => ({
-      id: m.id || '',
-      participant_name: m.participant_name || '',
-      acudiente_name: m.acudiente_name || '',
+      id: m.id || 'N/A',
+      participant_name: m.participant_name || 'N/A',
+      participant_documento: m.participant_documento || 'N/A',
+      acudiente_name: m.acudiente_name || 'N/A',
+      acudiente_documento: m.acudiente_documento || 'N/A',
       mes: getMonthLabel(m.mes),
-      año: m.año || '',
+      año: m.año || 'N/A',
+      periodo: `${getMonthLabel(m.mes)} ${m.año}`,
       valor: formatCurrencyForCSV(m.valor || m.monto || 0),
       estado: normalizeStatus(m.estado || m.status),
-      metodo_pago: m.metodo_pago || '',
+      metodo_pago: m.metodo_pago === 'TRANSFERENCIA' ? 'Transferencia' :
+                   m.metodo_pago === 'EFECTIVO' ? 'Efectivo' : 'N/A',
       fecha_pago: formatDateForCSV(m.fecha_pago),
-      observaciones: m.observaciones || ''
+      observaciones: m.observaciones || 'N/A'
     }));
 
-    const csvContent = arrayToCSV(csvData, headers);
+    // Calcular estadísticas
+    const pagadasCount = filteredMensualidades.filter(m =>
+      (m.estado || m.status) === 'PAGADO'
+    ).length;
+    
+    const pendientesCount = filteredMensualidades.filter(m =>
+      (m.estado || m.status) === 'PENDIENTE'
+    ).length;
+
+    const totalMonto = filteredMensualidades.reduce((sum, m) =>
+      sum + (parseFloat(m.valor || m.monto || 0)), 0
+    );
+
+    const montosPagados = filteredMensualidades
+      .filter(m => (m.estado || m.status) === 'PAGADO')
+      .reduce((sum, m) => sum + (parseFloat(m.valor || m.monto || 0)), 0);
+
+    const montosPendientes = filteredMensualidades
+      .filter(m => (m.estado || m.status) === 'PENDIENTE')
+      .reduce((sum, m) => sum + (parseFloat(m.valor || m.monto || 0)), 0);
+
+    // Contar métodos de pago
+    const transferenciaCount = filteredMensualidades.filter(m =>
+      m.metodo_pago === 'TRANSFERENCIA'
+    ).length;
+    
+    const efectivoCount = filteredMensualidades.filter(m =>
+      m.metodo_pago === 'EFECTIVO'
+    ).length;
+
+    const statistics = {
+      'Total de Mensualidades': filteredMensualidades.length,
+      'Mensualidades Pagadas': `${pagadasCount} (${((pagadasCount / filteredMensualidades.length) * 100).toFixed(1)}%)`,
+      'Mensualidades Pendientes': `${pendientesCount} (${((pendientesCount / filteredMensualidades.length) * 100).toFixed(1)}%)`,
+      'Monto Total': formatCurrencyForCSV(totalMonto),
+      'Monto Pagado': formatCurrencyForCSV(montosPagados),
+      'Monto Pendiente': formatCurrencyForCSV(montosPendientes),
+      'Pagos por Transferencia': `${transferenciaCount} (${((transferenciaCount / filteredMensualidades.length) * 100).toFixed(1)}%)`,
+      'Pagos en Efectivo': `${efectivoCount} (${((efectivoCount / filteredMensualidades.length) * 100).toFixed(1)}%)`
+    };
+
+    // Preparar filtros aplicados
+    const appliedFilters = {};
+    
+    if (filters.periodo !== 'all') {
+      const [mes, año] = filters.periodo.split('-');
+      appliedFilters.período = `${getMonthLabel(parseInt(mes))} ${año}`;
+    }
+    
+    if (filters.sede !== 'all') {
+      const sede = sedes.find(s => s.id.toString() === filters.sede);
+      appliedFilters.sede = sede?.nombre || filters.sede;
+    }
+    
+    if (filters.estado !== 'all') {
+      appliedFilters.estado = filters.estado === 'PAGADO' ? 'Pagada' :
+                              filters.estado === 'PENDIENTE' ? 'Pendiente' :
+                              filters.estado;
+    }
+    
+    if (filters.busqueda) {
+      appliedFilters.búsqueda = filters.busqueda;
+    }
+
+    const csvContent = createEnhancedCSV({
+      title: 'Reporte de Mensualidades',
+      data: csvData,
+      headers,
+      metadata: {
+        generatedBy: 'Sistema de Gestión Financiera'
+      },
+      statistics,
+      filters: appliedFilters
+    });
+
     const filename = `mensualidades_${new Date().toISOString().split('T')[0]}.csv`;
     downloadCSV(csvContent, filename);
-  }, [filteredMensualidades, getMonthLabel]);
+  }, [filteredMensualidades, getMonthLabel, filters, sedes]);
 
   if (loading) {
     return (

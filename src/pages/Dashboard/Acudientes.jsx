@@ -12,7 +12,7 @@ import {
   validateParticipanteExists
 } from "shared/utils/validationUtils";
 import {
-  arrayToCSV,
+  createEnhancedCSV,
   downloadCSV,
   formatParticipantName,
   formatDocument
@@ -292,25 +292,74 @@ const AcudientesComponent = () => {
       );
 
       return {
-        tipo_documento: acudiente.tipo_documento || '',
-        numero_documento: acudiente.numero_documento || '',
-        nombres: acudiente.nombres || '',
-        apellidos: acudiente.apellidos || '',
-        nombre_completo: `${acudiente.nombres || ''} ${acudiente.apellidos || ''}`.trim(),
-        parentesco: acudiente.parentesco || '',
-        telefono: acudiente.telefono || '',
-        email: acudiente.email || '',
-        direccion: acudiente.direccion || '',
-        participante_id: acudiente.id_participante || '',
+        tipo_documento: acudiente.tipo_documento || 'N/A',
+        numero_documento: acudiente.numero_documento || 'N/A',
+        nombres: acudiente.nombres || 'N/A',
+        apellidos: acudiente.apellidos || 'N/A',
+        nombre_completo: `${acudiente.nombres || ''} ${acudiente.apellidos || ''}`.trim() || 'N/A',
+        parentesco: acudiente.parentesco || 'N/A',
+        telefono: acudiente.telefono || 'N/A',
+        email: acudiente.email || 'N/A',
+        direccion: acudiente.direccion || 'N/A',
+        participante_id: acudiente.id_participante || 'N/A',
         participante_nombre: formatParticipantName(participante),
-        participante_documento: participante?.numero_documento || ''
+        participante_documento: participante?.numero_documento || 'N/A'
       };
     });
 
-    const csvContent = arrayToCSV(csvData, headers);
+    // Contar parentescos
+    const parentescoCounts = {};
+    filteredAcudientes.forEach(acudiente => {
+      const parentesco = acudiente.parentesco || 'Sin especificar';
+      parentescoCounts[parentesco] = (parentescoCounts[parentesco] || 0) + 1;
+    });
+
+    // Generar estadísticas
+    const statistics = {
+      'Total de Acudientes': filteredAcudientes.length,
+      'Acudientes con Email': filteredAcudientes.filter(a => a.email).length,
+      'Acudientes con Teléfono': filteredAcudientes.filter(a => a.telefono).length
+    };
+
+    // Agregar distribución de parentescos (top 5)
+    const topParentescos = Object.entries(parentescoCounts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5);
+    
+    topParentescos.forEach(([parentesco, count]) => {
+      statistics[`Parentesco ${parentesco}`] = `${count} (${((count / filteredAcudientes.length) * 100).toFixed(1)}%)`;
+    });
+
+    // Preparar filtros aplicados
+    const appliedFilters = {};
+    
+    if (filtros.participante !== 'Todos') {
+      const participante = participantes.find(p =>
+        (p.id_participante || p.id).toString() === filtros.participante
+      );
+      appliedFilters.participante = participante?.nombre ||
+        `${participante?.nombres || ''} ${participante?.apellidos || ''}`.trim() ||
+        'N/A';
+    }
+    
+    if (filtros.busqueda) {
+      appliedFilters.búsqueda = filtros.busqueda;
+    }
+
+    const csvContent = createEnhancedCSV({
+      title: 'Reporte de Acudientes',
+      data: csvData,
+      headers,
+      metadata: {
+        generatedBy: 'Sistema de Gestión'
+      },
+      statistics,
+      filters: appliedFilters
+    });
+
     const filename = `acudientes_${new Date().toISOString().split('T')[0]}.csv`;
     downloadCSV(csvContent, filename);
-  }, [filteredAcudientes, participantes]);
+  }, [filteredAcudientes, participantes, filtros]);
 
   if (loading) {
     return (

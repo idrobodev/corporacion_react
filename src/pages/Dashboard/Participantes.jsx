@@ -11,7 +11,7 @@ import {
   validateSedeExists
 } from "shared/utils/validationUtils";
 import {
-  arrayToCSV,
+  createEnhancedCSV,
   downloadCSV,
   calculateAge,
   formatDateForCSV,
@@ -313,24 +313,64 @@ const Participantes = React.memo(() => {
     ];
 
     const csvData = filteredParticipantes.map(participante => ({
-      tipo_documento: participante.tipo_documento || '',
-      numero_documento: participante.numero_documento || '',
-      nombres: participante.nombres || '',
-      apellidos: participante.apellidos || '',
+      tipo_documento: participante.tipo_documento || 'N/A',
+      numero_documento: participante.numero_documento || 'N/A',
+      nombres: participante.nombres || 'N/A',
+      apellidos: participante.apellidos || 'N/A',
       nombre_completo: formatParticipantName(participante),
       fecha_nacimiento: formatDateForCSV(participante.fecha_nacimiento),
-      edad: calculateAge(participante.fecha_nacimiento),
+      edad: calculateAge(participante.fecha_nacimiento) || 'N/A',
       genero: formatGender(participante.genero),
-      telefono: participante.telefono || '',
+      telefono: participante.telefono || 'N/A',
       sede: formatSede(participante.sede),
       fecha_ingreso: formatDateForCSV(participante.fecha_ingreso),
       estado: normalizeStatus(participante.estado)
     }));
 
-    const csvContent = arrayToCSV(csvData, headers);
+    // Generar estadísticas
+    const activosCount = filteredParticipantes.filter(p => {
+      const upper = String(p.estado || '').toUpperCase();
+      return upper === 'ACTIVO';
+    }).length;
+    
+    const inactivosCount = filteredParticipantes.filter(p => {
+      const upper = String(p.estado || '').toUpperCase();
+      return upper === 'INACTIVO';
+    }).length;
+
+    const masculinoCount = filteredParticipantes.filter(p => p.genero === 'MASCULINO').length;
+    const femeninoCount = filteredParticipantes.filter(p => p.genero === 'FEMENINO').length;
+
+    const statistics = {
+      'Total de Participantes': filteredParticipantes.length,
+      'Participantes Activos': `${activosCount} (${((activosCount / filteredParticipantes.length) * 100).toFixed(1)}%)`,
+      'Participantes Inactivos': `${inactivosCount} (${((inactivosCount / filteredParticipantes.length) * 100).toFixed(1)}%)`,
+      'Género Masculino': `${masculinoCount} (${((masculinoCount / filteredParticipantes.length) * 100).toFixed(1)}%)`,
+      'Género Femenino': `${femeninoCount} (${((femeninoCount / filteredParticipantes.length) * 100).toFixed(1)}%)`
+    };
+
+    // Preparar filtros aplicados
+    const appliedFilters = {
+      sede: filtros.sede !== 'Todas' ? filtros.sede : null,
+      género: filtros.genero !== 'Todos' ? filtros.genero : null,
+      estado: filtros.estado !== 'Todos' ? filtros.estado : null,
+      búsqueda: filtros.busqueda || null
+    };
+
+    const csvContent = createEnhancedCSV({
+      title: 'Reporte de Participantes',
+      data: csvData,
+      headers,
+      metadata: {
+        generatedBy: 'Sistema de Gestión'
+      },
+      statistics,
+      filters: appliedFilters
+    });
+
     const filename = `participantes_${new Date().toISOString().split('T')[0]}.csv`;
     downloadCSV(csvContent, filename);
-  }, [filteredParticipantes]);
+  }, [filteredParticipantes, filtros]);
 
   if (loading) {
     return (
