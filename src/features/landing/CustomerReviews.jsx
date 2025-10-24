@@ -5,9 +5,9 @@ import { GradientText } from "components/UI";
 const reviews = [
   {
     key: "testimonial1",
-    name: "María González",
+    name: "Sebastián Palacio Alvarez",
     title: "Testimonio de Transformación",
-    videoId: "kKsQRkOyKCI"
+    videoId: "42X2NldfryU"
   },
   {
     key: "testimonial2",
