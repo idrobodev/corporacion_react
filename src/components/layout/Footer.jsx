@@ -35,14 +35,14 @@ const Footer = () => {
             <a
               rel="noreferrer"
               target="_blank"
-              href="https://www.facebook.com/"
+              href="https://www.facebook.com/todoporunalmacorporacion/"
             >
               <i className="fab fa-facebook-square ml-2 hover:text-blue-400 transition"></i>
             </a>
             <a
               rel="noreferrer"
               target="_blank"
-              href="https://www.instagram.com/"
+              href="https://www.instagram.com/corporaciontodoporunalma/"
             >
               <i className="fab fa-instagram-square ml-2 hover:text-pink-400 transition"></i>
             </a>
@@ -52,14 +52,14 @@ const Footer = () => {
             <a
               rel="noreferrer"
               target="_blank"
-              href="https://www.youtube.com/"
+              href="https://www.youtube.com/@hermanamildrey"
             >
               <i className="fab fa-youtube ml-2 hover:text-red-400 transition"></i>
             </a>
             <a
               rel="noreferrer"
               target="_blank"
-              href="https://www.tiktok.com/"
+              href="https://www.tiktok.com/@corporaciontodoporunalma"
             >
               <i className="fab fa-tiktok ml-2 hover:text-black transition"></i>
             </a>
