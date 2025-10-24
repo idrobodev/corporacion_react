@@ -46,15 +46,22 @@ const Footer = () => {
             >
               <i className="fab fa-instagram-square ml-2 hover:text-pink-400 transition"></i>
             </a>
-            <a rel="noreferrer" target="_blank" href="https://twitter.com/">
-              <i className="fab fa-twitter-square ml-2 hover:text-blue-300 transition"></i>
+            <a rel="noreferrer" target="_blank" href="https://wa.me/573145702708">
+              <i className="fab fa-whatsapp ml-2 hover:text-green-400 transition"></i>
             </a>
             <a
               rel="noreferrer"
               target="_blank"
-              href="https://www.linkedin.com/"
+              href="https://www.youtube.com/"
             >
-              <i className="fab fa-linkedin ml-2 hover:text-blue-500 transition"></i>
+              <i className="fab fa-youtube ml-2 hover:text-red-400 transition"></i>
+            </a>
+            <a
+              rel="noreferrer"
+              target="_blank"
+              href="https://www.tiktok.com/"
+            >
+              <i className="fab fa-tiktok ml-2 hover:text-black transition"></i>
             </a>
           </div>
         </div>
