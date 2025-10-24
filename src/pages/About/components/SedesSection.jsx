@@ -7,31 +7,31 @@ import apartadoSedeImage from "assets/images/nosotros/sedes/apartado.jpg";
 
 const sedes = [
   {
-    id: "bello",
-    name: "Sede Bello",
+    id: "bello-principal",
+    name: "Sede Bello Principal",
     location: "Bello, Antioquia",
-    address: "Carrera 50 # 52 - 21",
-    phone: "+57 310 457 7835",
-    director: "Dr. Juan Pérez - Director Médico",
+    address: "Vereda Potreritos - Finca el alto",
+    phone: "+57 314 570 2708",
+    director: "Dr. Juan Camilo Machado - Director Psicológico",
     image: belloSedeImage,
+  },
+  {
+    id: "bello-campestre",
+    name: "Sede Bello Campestre",
+    location: "Bello, Antioquia",
+    address: "Vereda potreritos - Estadero la planta",
+    phone: "+57 310 390 1169",
+    director: "Dra. Mildrey Leonel Melo - Directora Psicológica",
+    image: medellinSedeImage,
   },
   {
     id: "apartado",
     name: "Sede Apartadó",
     location: "Apartadó, Antioquia",
-    address: "Calle 10 # 15 - 30",
-    phone: "+57 310 457 7837",
+    address: "Calle 102BB # 76 - 34 Barrio 20 de Enero",
+    phone: "+57 310 457 7835",
     director: "Dr. Carlos Rojas - Director Sede",
     image: apartadoSedeImage,
-  },
-  {
-    id: "medellin",
-    name: "Sede Medellín",
-    location: "Medellín, Antioquia",
-    address: "Carrera 70 # 45 - 12",
-    phone: "+57 310 457 7836",
-    director: "Dra. Ana María López - Directora Médica",
-    image: medellinSedeImage,
   },
 ];
 
