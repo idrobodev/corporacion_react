@@ -97,15 +97,31 @@ const Footer = () => {
           <div className="py-4 font-Poppins">
             <p className="flex items-center">
               <i className="fas fa-phone-alt mr-3"></i>
-              <span>+57 3145702708</span>
+              <span>Bello Principal: +57 3145702708</span>
+            </p>
+            <p className="py-1 flex items-center">
+              <i className="fas fa-phone-alt mr-3"></i>
+              <span>Bello Campestre: +57 3103901169</span>
+            </p>
+            <p className="py-1 flex items-center">
+              <i className="fas fa-phone-alt mr-3"></i>
+              <span>Apartadó: +57 3104577835</span>
             </p>
             <p className="py-2 flex items-center">
-              <i className="far fa-envelope mr-3"></i> 
+              <i className="far fa-envelope mr-3"></i>
               <span>trabajosocial@todoporunalma.org</span>
             </p>
             <p className="flex items-center">
-              <i className="fas fa-map-marker-alt mr-3"></i> 
-              <span>Antioquia (Bello y Apartadó)</span>
+              <i className="fas fa-map-marker-alt mr-3"></i>
+              <span>Bello Principal: Vereda Potreritos - Finca el alto</span>
+            </p>
+            <p className="py-1 flex items-center">
+              <i className="fas fa-map-marker-alt mr-3"></i>
+              <span>Bello Campestre: Vereda potreritos - Estadero la planta</span>
+            </p>
+            <p className="py-1 flex items-center">
+              <i className="fas fa-map-marker-alt mr-3"></i>
+              <span>Apartadó: Calle 102BB # 76 - 34 Barrio 20 de Enero</span>
             </p>
             <p className="pt-4 text-sm">
               <i className="fas fa-users mr-2"></i>
